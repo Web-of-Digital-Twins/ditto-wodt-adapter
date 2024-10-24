@@ -1,7 +1,5 @@
 package org.eclipse.ditto.wodt;
 
-import java.net.URI;
-import java.util.Optional;
 import java.util.Set;
 
 import org.eclipse.ditto.wodt.WoDTShadowingAdapter.api.WoDTDigitalAdapterConfiguration;
