@@ -1,21 +1,5 @@
 package org.eclipse.ditto.wodt.WoDTShadowingAdapter.api;
 
-/*
- * Copyright (c) 2023. Andrea Giulianelli
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 import java.net.URI;
 import java.util.HashSet;
 import java.util.Set;
@@ -30,42 +14,63 @@ import org.eclipse.ditto.wodt.common.DittoBase;
  * Configuration for the {@link WoDTDigitalAdapter}.
 */
 public final class WoDTDigitalAdapterConfiguration {
-    private final String digitalTwinUri;
+    private final URI dittoEndpoint;
+    private final String dittoUsername;
+    private final String dittoPassword;
+    private final URI digitalTwinUri;
     private final int portNumber;
     private final String physicalAssetId;
     private final Set<URI> platformToRegister;
     private final OntologyManagerImpl ontologyManager;
     private final Thing thing;
 
-    /**
-     * Default constructor.
-    * @param digitalTwinUri the uri of the WoDT Digital Twin
-    * @param ontology the ontology to use for the semantics
-    * @param portNumber the port number where to expose services
-    * @param physicalAssetId the id of the associated physical asset
-    * @param platformToRegister the platforms to which register
-    */
     public WoDTDigitalAdapterConfiguration(
+        final URI dittoEndpoint,
+        final String dittoUsername,
+        final String dittoPassword,
         final String thingId,
         final String yamlOntologyPath,
         final String physicalAssetId,
-        final Set<URI> platformToRegister
+        final Set<URI> platformToRegister,
+        final URI digitalTwinUri,
+        final int digitalTwinExposedPort
     ) {
+        this.dittoEndpoint = dittoEndpoint;
+        this.dittoUsername = dittoUsername;
+        this.dittoPassword = dittoPassword;
         this.thing = this.obtainDittoThing(thingId);
         this.ontologyManager = new OntologyManagerImpl(this.thing, yamlOntologyPath);
-        this.digitalTwinUri = "http://" + System.getenv("MODULE_URI") + ":" + System.getenv("MODULE_PORT") + "/";
-        this.portNumber = Integer.parseInt(System.getenv("MODULE_PORT"));
+        this.digitalTwinUri = digitalTwinUri;
+        this.portNumber = digitalTwinExposedPort;
         this.physicalAssetId = physicalAssetId;
         this.platformToRegister = new HashSet<>(platformToRegister);
     }
 
     private Thing obtainDittoThing(String dittoThingId) {
-        return new DittoBase().getClient().twin()
+        return new DittoBase(this.dittoEndpoint, this.dittoUsername, this.dittoPassword).getClient().twin()
             .forId(ThingId.of(dittoThingId))
             .retrieve()
             .toCompletableFuture()
             .join();
     }
+
+    /**
+     * Get ditto endpoint.
+     * @return the ditto endpoint uri
+     */
+    public URI getDittoEndpoint() {return this.dittoEndpoint; }
+
+    /**
+     * Get ditto username.
+     * @return the username
+     */
+    public String getDittoUsername() {return this.dittoUsername;}
+
+    /**
+     * Get ditto password.
+     * @return the password
+     */
+    public String getDittoPassword() {return this.dittoPassword;}
 
     /*
      * Return the Ditto Thing associated with the Digital Twin.
@@ -78,7 +83,7 @@ public final class WoDTDigitalAdapterConfiguration {
      * Obtain the WoDT Digital Twin URI.
     * @return the URI.
     */
-    public String getDigitalTwinUri() {
+    public URI getDigitalTwinUri() {
         return this.digitalTwinUri;
     }
 

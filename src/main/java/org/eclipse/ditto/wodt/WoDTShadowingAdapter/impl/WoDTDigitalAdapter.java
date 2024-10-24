@@ -52,7 +52,12 @@ public final class WoDTDigitalAdapter {
             this.dtdManager,
             this.platformManagementInterface
         );
-        this.dittoClientThread = new DittoThingListener(this);
+        this.dittoClientThread = new DittoThingListener(
+                configuration.getDittoEndpoint(),
+                configuration.getDittoUsername(),
+                configuration.getDittoPassword(),
+                this
+        );
         this.startAdapter();        
     }
 

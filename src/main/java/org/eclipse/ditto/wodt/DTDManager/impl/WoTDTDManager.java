@@ -1,5 +1,6 @@
 package org.eclipse.ditto.wodt.DTDManager.impl;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,7 +49,7 @@ public class WoTDTDManager implements DTDManager {
     private static final String THING_DESCRIPTION_CONTEXT = "https://www.w3.org/2019/wot/td/v1";
     private static final String VERSION = "1.0.0";
     private static final String SNAPSHOT_DTD_PROPERTY = "snapshot";
-    private final String digitalTwinUri;
+    private final URI digitalTwinUri;
     private final String physicalAssetId;
     private final DTOntology ontology;
     private final int portNumber;
@@ -127,7 +128,7 @@ public class WoTDTDManager implements DTDManager {
                 context.addContext(contextExtensions.getField(), contextExtensions.getFeature().get())
             );
             final ExposedThing thingDescription = new DefaultWot().produce(new Thing.Builder()
-                    .setId(this.digitalTwinUri)
+                    .setId(this.digitalTwinUri.toString())
                     .setObjectContext(context)
                     .build()
             );
@@ -255,7 +256,7 @@ public class WoTDTDManager implements DTDManager {
         final ThingProperty<?> snapshotProperty = thingDescription.getProperty(SNAPSHOT_DTD_PROPERTY);
         snapshotProperty.addForm(new Form.Builder()
                 .addOp(Operation.OBSERVE_PROPERTY)
-                .setHref("ws://" + System.getenv("MODULE_URI") + ":" + this.portNumber + "/dtkg")
+                .setHref(this.configuration.getDigitalTwinUri().resolve("/dtkg").toString())
                 .setSubprotocol("websocket")
                 .build());
         thingDescription.getMetadata()
