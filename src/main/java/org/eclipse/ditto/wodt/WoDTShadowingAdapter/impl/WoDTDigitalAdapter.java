@@ -40,7 +40,10 @@ public final class WoDTDigitalAdapter {
         this.configuration = configuration;
         this.platformManagementInterface = new BasePlatformManagementInterface(
             this.configuration.getDigitalTwinUri());
-        this.dtkgEngine = new JenaDTKGEngine(this.configuration.getDigitalTwinUri());
+        this.dtkgEngine = new JenaDTKGEngine(
+                this.configuration.getDigitalTwinUri(),
+                this.configuration.getOntology().getDigitalTwinType()
+        );
         this.dtdManager = new WoTDTDManager(
             this.configuration,
             this.platformManagementInterface
@@ -53,7 +56,7 @@ public final class WoDTDigitalAdapter {
             this.platformManagementInterface
         );
         this.dittoClientThread = new DittoThingListener(
-                configuration.getDittoEndpoint(),
+                configuration.getDittoObservationEndpoint(),
                 configuration.getDittoUsername(),
                 configuration.getDittoPassword(),
                 this
@@ -64,7 +67,7 @@ public final class WoDTDigitalAdapter {
     private void startAdapter() {
         this.woDTWebServer.start();
         this.configuration.getPlatformToRegister().forEach(platform ->
-                this.platformManagementInterface.registerToPlatform(platform, this.dtdManager.getDTD().toJson()));
+                this.platformManagementInterface.registerToPlatform(platform, this.dtdManager.getDTD().toJsonString()));
         dittoClientThread.start();
     }
 
@@ -74,24 +77,20 @@ public final class WoDTDigitalAdapter {
     }
 
     private void handleRelationship(String key, String value, boolean isDeletion) {
-        configuration.getOntology().obtainPropertyValueType(key).ifPresent(
-            relType -> {
-                configuration.getOntology().convertRelationship(key, value).ifPresent(triple -> {
-                    if (isDeletion) {
-                        this.dtkgEngine.removeRelationship(triple.getLeft(), triple.getRight());
-                        this.dtdManager.removeRelationship(key);
-                    } else {
-                        this.dtkgEngine.addRelationship(triple.getLeft(), triple.getRight());
-                        this.dtdManager.addRelationship(key);
-                    }
-                });
+        configuration.getOntology().mapRelationshipInstance(key, value).ifPresent(triple -> {
+            if (isDeletion) {
+                this.dtkgEngine.removeRelationship(triple.getLeft());
+                this.dtdManager.removeRelationship(key);
+            } else {
+                this.dtkgEngine.addRelationship(triple.getLeft(), triple.getRight());
+                this.dtdManager.addRelationship(key);
             }
-        );
+        });
     }
     
     private void handleProperty(String key, String value, boolean isFeatureProperty, boolean isDeletion, String featureId) {
         String fullPropertyName = (isFeatureProperty ? featureId + "_" : "") + key;
-        configuration.getOntology().convertPropertyValue(fullPropertyName, convertStringToType(value)).ifPresent(triple -> {
+        configuration.getOntology().mapPropertyData(fullPropertyName, convertStringToType(value)).ifPresent(triple -> {
             if (isDeletion) {
                 this.dtkgEngine.removeProperty(triple.getLeft());
                 this.dtdManager.removeProperty(fullPropertyName);
@@ -174,11 +173,11 @@ public final class WoDTDigitalAdapter {
 
     public void onThingChange(ThingChange change) {
         switch (change.getAction()) {
-            case CREATED:
-            case UPDATED:
+            case CREATED, MERGED, UPDATED:
                 change.getThing().get().getAttributes().ifPresent(attributes -> {
                     attributes.forEach((attribute) -> {
                         if (attribute.getKey().toString().contains("rel-")) {
+                            handleRelationship(attribute.getKey().toString(), null, true);
                             handleRelationship(attribute.getKey().toString(), attribute.getValue().asString(), false);
                         } else {
                             handleProperty(attribute.getKey().toString(), attribute.getValue().toString(), false, false, null);
