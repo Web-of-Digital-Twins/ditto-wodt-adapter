@@ -8,10 +8,16 @@ import java.util.Optional;
  */
 public interface ConfigurationLoader {
     /**
-     * Get the ditto endpoint.
+     * Get the ditto url.
+     * @return the url.
+     */
+    URI getDittoUrl();
+
+    /**
+     * Get the ditto observation endpoint.
      * @return the endpoint.
      */
-    URI getDittoEndpoint();
+    URI getDittoObservationEndpoint();
 
     /**
      * Get the ditto username.
@@ -60,4 +66,10 @@ public interface ConfigurationLoader {
      * @return the port to expose
      */
     int getDigitalTwinExposedPort();
+
+    /**
+     * Get the version of the exposed WoDT Digital Twin.
+     * @return the version.
+     */
+    String getDigitalTwinVersion();
 }
