@@ -21,6 +21,8 @@ dependencies {
     implementation(libs.jackson.dataformat.yaml)
     implementation(libs.javalin)
     implementation(libs.jena)
+    implementation(libs.slf4j.api)
+    implementation(libs.slf4j.simple)
     implementation(libs.wot.servient)
     testImplementation(libs.bundles.java.testing)
     testRuntimeOnly(libs.junit.engine)
