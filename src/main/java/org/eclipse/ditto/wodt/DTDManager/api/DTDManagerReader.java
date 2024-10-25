@@ -16,7 +16,7 @@
 
 package org.eclipse.ditto.wodt.DTDManager.api;
 
-import io.github.sanecity.wot.thing.Thing;
+import org.eclipse.ditto.wot.model.ThingDescription;
 
 /**
  * Reader part of the DTDManager component of the Abstract Architecture -- for ISP.
@@ -27,5 +27,5 @@ public interface DTDManagerReader {
      * Obtain the Digital Twin Descriptor.
     * @return Digital Twin Descriptor implemented with a Thing Description
     */
-    Thing<?, ?, ?> getDTD();
+    ThingDescription getDTD();
 }

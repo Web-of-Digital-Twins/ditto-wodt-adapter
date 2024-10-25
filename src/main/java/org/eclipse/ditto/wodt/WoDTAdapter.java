@@ -16,7 +16,8 @@ public class WoDTAdapter {
 
         new WoDTDigitalAdapter(
             new WoDTDigitalAdapterConfiguration(
-                configurationLoader.getDittoEndpoint(),
+                configurationLoader.getDittoUrl(),
+                configurationLoader.getDittoObservationEndpoint(),
                 configurationLoader.getDittoUsername(),
                 configurationLoader.getDittoPassword(),
                 configurationLoader.getDittoThingId(),
@@ -24,7 +25,8 @@ public class WoDTAdapter {
                 configurationLoader.getPhysicalAssetId(),
                 configurationLoader.getPlatformUri().map(Set::of).orElseGet(Set::of),
                 configurationLoader.getDigitalTwinUri(),
-                configurationLoader.getDigitalTwinExposedPort()
+                configurationLoader.getDigitalTwinExposedPort(),
+                configurationLoader.getDigitalTwinVersion()
             )
         );
     }    

@@ -14,7 +14,8 @@ import org.eclipse.ditto.wodt.common.DittoBase;
  * Configuration for the {@link WoDTDigitalAdapter}.
 */
 public final class WoDTDigitalAdapterConfiguration {
-    private final URI dittoEndpoint;
+    private final URI dittoUrl;
+    private final URI dittoObservationEndpoint;
     private final String dittoUsername;
     private final String dittoPassword;
     private final URI digitalTwinUri;
@@ -23,9 +24,11 @@ public final class WoDTDigitalAdapterConfiguration {
     private final Set<URI> platformToRegister;
     private final OntologyManagerImpl ontologyManager;
     private final Thing thing;
+    private final String digitalTwinVersion;
 
     public WoDTDigitalAdapterConfiguration(
-        final URI dittoEndpoint,
+        final URI dittoUrl,
+        final URI dittoObservationEndpoint,
         final String dittoUsername,
         final String dittoPassword,
         final String thingId,
@@ -33,9 +36,11 @@ public final class WoDTDigitalAdapterConfiguration {
         final String physicalAssetId,
         final Set<URI> platformToRegister,
         final URI digitalTwinUri,
-        final int digitalTwinExposedPort
+        final int digitalTwinExposedPort,
+        final String digitalTwinVersion
     ) {
-        this.dittoEndpoint = dittoEndpoint;
+        this.dittoUrl = dittoUrl;
+        this.dittoObservationEndpoint = dittoObservationEndpoint;
         this.dittoUsername = dittoUsername;
         this.dittoPassword = dittoPassword;
         this.thing = this.obtainDittoThing(thingId);
@@ -44,10 +49,11 @@ public final class WoDTDigitalAdapterConfiguration {
         this.portNumber = digitalTwinExposedPort;
         this.physicalAssetId = physicalAssetId;
         this.platformToRegister = new HashSet<>(platformToRegister);
+        this.digitalTwinVersion = digitalTwinVersion;
     }
 
     private Thing obtainDittoThing(String dittoThingId) {
-        return new DittoBase(this.dittoEndpoint, this.dittoUsername, this.dittoPassword).getClient().twin()
+        return new DittoBase(this.dittoObservationEndpoint, this.dittoUsername, this.dittoPassword).getClient().twin()
             .forId(ThingId.of(dittoThingId))
             .retrieve()
             .toCompletableFuture()
@@ -55,10 +61,16 @@ public final class WoDTDigitalAdapterConfiguration {
     }
 
     /**
+     * Get ditto url.
+     * @return the ditto url
+     */
+    public URI getDittoUrl() {return this.dittoUrl; }
+
+    /**
      * Get ditto endpoint.
      * @return the ditto endpoint uri
      */
-    public URI getDittoEndpoint() {return this.dittoEndpoint; }
+    public URI getDittoObservationEndpoint() {return this.dittoObservationEndpoint; }
 
     /**
      * Get ditto username.
@@ -117,5 +129,9 @@ public final class WoDTDigitalAdapterConfiguration {
     */
     public Set<URI> getPlatformToRegister() {
         return new HashSet<>(this.platformToRegister);
+    }
+
+    public String getDigitalTwinVersion() {
+        return this.digitalTwinVersion;
     }
 }

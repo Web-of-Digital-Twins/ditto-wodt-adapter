@@ -70,7 +70,7 @@ final class WoDTDigitalTwinInterfaceControllerImpl implements WoDTDigitalTwinInt
             context.header(Header.CONTENT_TYPE, "text/turtle");
             context.result(dtkg);
         }
-        context.header(Header.LINK, "</dtd>; rel=\"" + WoDTVocabulary.HAS_DESCRIPTOR + "\"");
+        context.header(Header.LINK, "</dtd>; rel=\"" + WoDTVocabulary.DTD + "\"");
     }
 
     @Override
@@ -87,7 +87,7 @@ final class WoDTDigitalTwinInterfaceControllerImpl implements WoDTDigitalTwinInt
 
     @Override
     public void routeGetDigitalTwinDescriptor(final Context context) {
-        final String dtd = this.dtdManager.getDTD().toJson();
+        final String dtd = this.dtdManager.getDTD().toJsonString();
         if (dtd.isBlank()) {
             context.status(HttpStatus.NO_CONTENT);
         } else {
@@ -95,7 +95,6 @@ final class WoDTDigitalTwinInterfaceControllerImpl implements WoDTDigitalTwinInt
             context.header(Header.CONTENT_TYPE, "application/td+json");
             context.result(dtd);
         }
-        context.header(Header.LINK, "</dtkg>; rel=\"" + WoDTVocabulary.CURRENT_STATUS + "\"");
     }
 
     @Override
