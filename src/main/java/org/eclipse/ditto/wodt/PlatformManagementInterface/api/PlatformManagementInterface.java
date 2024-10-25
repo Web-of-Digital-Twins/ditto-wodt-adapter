@@ -26,7 +26,7 @@ public interface PlatformManagementInterface extends
     /**
      * This method allows the component to send the registration request to the passed WoDT Digital Twins Platform.
     * @param platformUrl the platformUrl to which register
-    * @param currentDtd the current Digital Twin Descriptor
+    * @param currentDtd the current Digital Twin Description
     * @return true if correctly registered, false instead
     */
     boolean registerToPlatform(URI platformUrl, String currentDtd);

@@ -24,8 +24,8 @@ import org.eclipse.ditto.wot.model.ThingDescription;
 public interface DTDManagerReader {
 
     /**
-     * Obtain the Digital Twin Descriptor.
-    * @return Digital Twin Descriptor implemented with a Thing Description
+     * Obtain the Digital Twin Description.
+    * @return Digital Twin Description implemented with a Thing Description
     */
     ThingDescription getDTD();
 }

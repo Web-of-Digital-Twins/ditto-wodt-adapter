@@ -86,7 +86,7 @@ final class WoDTDigitalTwinInterfaceControllerImpl implements WoDTDigitalTwinInt
     }
 
     @Override
-    public void routeGetDigitalTwinDescriptor(final Context context) {
+    public void routeGetDigitalTwinDescription(final Context context) {
         final String dtd = this.dtdManager.getDTD().toJsonString();
         if (dtd.isBlank()) {
             context.status(HttpStatus.NO_CONTENT);
@@ -106,7 +106,7 @@ final class WoDTDigitalTwinInterfaceControllerImpl implements WoDTDigitalTwinInt
     public void registerRoutes(final Javalin app) {
         app.get("/", this::routeGetDigitalTwin);
         app.get("/dtkg", this::routeGetDigitalTwinKnowledgeGraph);
-        app.get("/dtd", this::routeGetDigitalTwinDescriptor);
+        app.get("/dtd", this::routeGetDigitalTwinDescription);
         app.ws("/dtkg", this::routeGetDigitalTwinKnowledgeGraphEvents);
     }
 }

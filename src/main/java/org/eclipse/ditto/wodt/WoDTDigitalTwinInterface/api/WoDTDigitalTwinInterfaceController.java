@@ -44,10 +44,10 @@ public interface WoDTDigitalTwinInterfaceController extends WebServerController 
     void routeGetDigitalTwinKnowledgeGraphEvents(WsConfig wsContext);
 
     /**
-     * Get Digital Twin Descriptor controller.
+     * Get Digital Twin Description controller.
     * @param context the javalin context
     */
-    void routeGetDigitalTwinDescriptor(Context context);
+    void routeGetDigitalTwinDescription(Context context);
 
     /**
      * Notify the presence of a new Digital Twin Knowledge Graph.

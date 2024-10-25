@@ -48,7 +48,7 @@ import org.eclipse.ditto.wot.model.Version;
 
 /**
  * This class provide an implementation of the {@link DTDManager} using
-* a WoT Thing Description to implement the Digital Twin Descriptor.
+* a WoT Thing Description to implement the Digital Twin Description.
 */
 public class WoTDTDManager implements DTDManager {
     private static final String ATTRIBUTE_URL = "/attributes/{attributePath}";
