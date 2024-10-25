@@ -16,6 +16,7 @@ repositories {
 
 dependencies {
     implementation(libs.ditto.client)
+    implementation(libs.ditto.wot.model)
     implementation(libs.jackson.databind)
     implementation(libs.jackson.dataformat.yaml)
     implementation(libs.javalin)

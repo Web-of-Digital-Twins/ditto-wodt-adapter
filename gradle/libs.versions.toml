@@ -6,6 +6,7 @@ junit = "5.11.3"
 
 [libraries]
 ditto-client = { module = "org.eclipse.ditto:ditto-client", version = "3.0.0" }
+ditto-wot-model = { module = "org.eclipse.ditto:ditto-wot-model", version = "3.6.1" }
 jackson-databind = { module = "com.fasterxml.jackson.core:jackson-databind", version = "2.17.2" }
 jackson-dataformat-yaml = { module = "com.fasterxml.jackson.dataformat:jackson-dataformat-yaml", version = "2.18.0-rc1" }
 javalin = { module = "io.javalin:javalin", version = "6.2.0" }
