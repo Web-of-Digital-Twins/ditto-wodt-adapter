@@ -22,14 +22,14 @@ import java.util.Optional;
 /**
  * It models the concept of RDF Property in the context of Digital Twin Knowledge Graph.
  */
-public final class Property implements Resource {
+public final class RdfProperty implements Resource {
     private final String propertyUri;
 
     /**
      * Default constructor.
      * @param propertyUri the uri of the property
      */
-    public Property(final String propertyUri) {
+    public RdfProperty(final String propertyUri) {
         this.propertyUri = propertyUri;
     }
 

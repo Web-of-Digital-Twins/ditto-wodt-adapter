@@ -18,7 +18,7 @@ package org.eclipse.ditto.wodt.DTKGEngine.api;
 
 import org.eclipse.ditto.wodt.model.ontology.Individual;
 import org.eclipse.ditto.wodt.model.ontology.Node;
-import org.eclipse.ditto.wodt.model.ontology.Property;
+import org.eclipse.ditto.wodt.model.ontology.RdfProperty;
 
 /**
  * This interface models the DTKGEngine component of the Abstract Architecture in a compatible way with Ditto.
@@ -34,21 +34,21 @@ public interface DTKGEngine extends DTKGEngineReader {
     * @param property the property to add/update
     * @param newValue the value of the property.
     */
-    void addDigitalTwinPropertyUpdate(Property property, Node newValue);
+    void addDigitalTwinPropertyUpdate(RdfProperty property, Node newValue);
 
     /**
      * Remove a Digital Twin property within the Digital Twin Knowledge Graph.
     * @param property the property to delete.
     * @return true if deleted, false if not-existent.
     */
-    boolean removeProperty(Property property);
+    boolean removeProperty(RdfProperty property);
 
     /**
      * Add a relationship with another Digital Twin.
     * @param relationshipPredicate the associated predicate
     * @param targetIndividual the target individual
     */
-    void addRelationship(Property relationshipPredicate, Individual targetIndividual);
+    void addRelationship(RdfProperty relationshipPredicate, Individual targetIndividual);
 
     /**
      * Delete an existing relationship with another Digital Twin.
@@ -56,7 +56,14 @@ public interface DTKGEngine extends DTKGEngineReader {
     * @param targetIndividual the target individual.
     * @return true if correctly deleted, false if the relationship doesn't exist
     */
-    boolean removeRelationship(Property relationshipPredicate, Individual targetIndividual);
+    boolean removeRelationship(RdfProperty relationshipPredicate, Individual targetIndividual);
+
+    /**
+     * Delete all the occurrences of a relationship with another Digital Twin.
+     * @param relationshipPredicate the associated predicate
+     * @return true if correctly deleted, false if the relationship doesn't exist
+     */
+    boolean removeRelationship(RdfProperty relationshipPredicate);
 
     /**
      * Add an available action on the Digital Twin Knowledge Graph.

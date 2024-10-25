@@ -27,7 +27,7 @@ import org.apache.commons.lang3.tuple.Pair;
  * A Blank Node could have an associated list of predicates.
  */
 public final class BlankNode implements Resource {
-    private final List<Pair<Property, Node>> predicates;
+    private final List<Pair<RdfProperty, Node>> predicates;
 
     /**
      * Default constructor.
@@ -41,7 +41,7 @@ public final class BlankNode implements Resource {
      * Constructor that allows you to configure the Blank Node with existing predicates.
      * @param predicates the predicates to add
      */
-    public BlankNode(final List<Pair<Property, Node>> predicates) {
+    public BlankNode(final List<Pair<RdfProperty, Node>> predicates) {
         this.predicates = new ArrayList<>(predicates);
     }
 
@@ -51,8 +51,8 @@ public final class BlankNode implements Resource {
      * @param predicate the predicate to add
      * @return the modified version of the Blank Node
      */
-    public BlankNode addPredicate(final Pair<Property, Node> predicate) {
-        final List<Pair<Property, Node>> resultingPredicates = new ArrayList<>(this.predicates);
+    public BlankNode addPredicate(final Pair<RdfProperty, Node> predicate) {
+        final List<Pair<RdfProperty, Node>> resultingPredicates = new ArrayList<>(this.predicates);
         resultingPredicates.add(predicate);
         return new BlankNode(resultingPredicates);
     }
@@ -61,7 +61,7 @@ public final class BlankNode implements Resource {
      * Get the predicates inside the Blank node.
      * @return the list of predicates
      */
-    public List<Pair<Property, Node>> getPredicates() {
+    public List<Pair<RdfProperty, Node>> getPredicates() {
         return new ArrayList<>(this.predicates);
     }
 

@@ -16,6 +16,7 @@ package org.eclipse.ditto.wodt.DTKGEngine.impl;
  * limitations under the License.
  */
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -23,22 +24,24 @@ import java.util.function.Consumer;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.jena.rdf.model.Model;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.Property;
 import org.apache.jena.rdf.model.Resource;
-import org.apache.jena.rdf.model.ResourceFactory;
 import org.apache.jena.riot.Lang;
 import org.apache.jena.riot.RDFWriter;
 import org.apache.jena.shared.Lock;
+import org.apache.jena.vocabulary.RDF;
 import org.eclipse.ditto.wodt.DTKGEngine.api.DTKGEngine;
 import org.eclipse.ditto.wodt.DTKGEngine.api.DTKGObserver;
 import org.eclipse.ditto.wodt.model.ontology.BlankNode;
+import org.eclipse.ditto.wodt.model.ontology.DTOntology;
 import org.eclipse.ditto.wodt.model.ontology.Individual;
 import org.eclipse.ditto.wodt.model.ontology.Literal;
 import org.eclipse.ditto.wodt.model.ontology.Node;
-import org.eclipse.ditto.wodt.model.ontology.Property;
+import org.eclipse.ditto.wodt.model.ontology.RdfProperty;
 import org.eclipse.ditto.wodt.model.ontology.WoDTVocabulary;
 
 /**
- * This class provides an implementation of the {@link io.github.webbasedwodt.application.component.DTKGEngine} using
+ * This class provides an implementation of the {@link DTKGEngine} using
 * Apache Jena.
 */
 public class JenaDTKGEngine implements DTKGEngine {
@@ -49,10 +52,12 @@ public class JenaDTKGEngine implements DTKGEngine {
     /**
      * Default constructor.
     * @param digitalTwinUri the uri of the Digital Twin for which this class creates the DTKG
+    * @param digitalTwinType the type of the Digital Twin
     */
-    public JenaDTKGEngine(final String digitalTwinUri) {
+    public JenaDTKGEngine(final URI digitalTwinUri, final String digitalTwinType) {
         this.dtkgModel = ModelFactory.createDefaultModel();
-        this.digitalTwinResource = this.dtkgModel.createResource(digitalTwinUri);
+        this.digitalTwinResource = this.dtkgModel.createResource(digitalTwinUri.toString());
+        this.digitalTwinResource.addProperty(RDF.type, this.dtkgModel.createResource(digitalTwinType));
         this.observers = new ArrayList<>();
     }
 
@@ -63,7 +68,7 @@ public class JenaDTKGEngine implements DTKGEngine {
     }
 
     @Override
-    public void addDigitalTwinPropertyUpdate(final Property property, final Node newValue) {
+    public void addDigitalTwinPropertyUpdate(final RdfProperty property, final Node newValue) {
         if (property.getUri().isPresent()) {
             this.writeModel(model -> {
                 this.digitalTwinResource.removeAll(model.getProperty(property.getUri().get()));
@@ -74,7 +79,7 @@ public class JenaDTKGEngine implements DTKGEngine {
     }
 
     @Override
-    public boolean removeProperty(final Property property) {
+    public boolean removeProperty(final RdfProperty property) {
         if (property.getUri().isPresent()
                 && this.digitalTwinResource.hasProperty(this.dtkgModel.getProperty(property.getUri().get()))) {
             this.writeModel(model ->
@@ -88,7 +93,7 @@ public class JenaDTKGEngine implements DTKGEngine {
     }
 
     @Override
-    public void addRelationship(final Property relationshipPredicate, final Individual targetIndividual) {
+    public void addRelationship(final RdfProperty relationshipPredicate, final Individual targetIndividual) {
         if (relationshipPredicate.getUri().isPresent()) {
             this.writeModel(model ->
                     addProperty(this.digitalTwinResource, Pair.of(relationshipPredicate, targetIndividual))
@@ -98,7 +103,7 @@ public class JenaDTKGEngine implements DTKGEngine {
     }
 
     @Override
-    public boolean removeRelationship(final Property relationshipPredicate, final Individual targetIndividual) {
+    public boolean removeRelationship(final RdfProperty relationshipPredicate, final Individual targetIndividual) {
         if (relationshipPredicate.getUri().isPresent()
                 && targetIndividual.getUri().isPresent()
                 && this.digitalTwinResource.hasProperty(this.dtkgModel.getProperty(relationshipPredicate.getUri().get()))) {
@@ -108,6 +113,20 @@ public class JenaDTKGEngine implements DTKGEngine {
                             this.dtkgModel.getProperty(relationshipPredicate.getUri().get()),
                             model.getResource(targetIndividual.getUri().get())
                     )
+            );
+            this.notifyObservers();
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public boolean removeRelationship(RdfProperty relationshipPredicate) {
+        if (relationshipPredicate.getUri().isPresent()
+                && this.digitalTwinResource.hasProperty(this.dtkgModel.getProperty(relationshipPredicate.getUri().get()))) {
+            this.writeModel(model ->
+                    this.digitalTwinResource.removeAll(this.dtkgModel.getProperty(relationshipPredicate.getUri().get()))
             );
             this.notifyObservers();
             return true;
@@ -135,11 +154,11 @@ public class JenaDTKGEngine implements DTKGEngine {
                 actionId)
         ) {
             this.writeModel(model ->
-                    model.remove(
-                            this.digitalTwinResource,
-                            model.getProperty(WoDTVocabulary.AVAILABLE_ACTION_ID.getUri()),
-                            ResourceFactory.createStringLiteral(actionId)
-                    )
+                model.remove(
+                    this.digitalTwinResource,
+                    model.getProperty(WoDTVocabulary.AVAILABLE_ACTION_ID.getUri()),
+                    model.createTypedLiteral(actionId)
+                )
             );
             return true;
         }
@@ -166,13 +185,13 @@ public class JenaDTKGEngine implements DTKGEngine {
         this.observers.forEach(observer -> observer.notifyNewDTKG(currentDTKG));
     }
 
-    private void addProperty(final Resource resourceToAdd, final Pair<Property, Node> predicate) {
+    private void addProperty(final Resource resourceToAdd, final Pair<RdfProperty, Node> predicate) {
         final String propertyUri = predicate.getLeft().getUri().orElse("");
-        final org.apache.jena.rdf.model.Property property = this.dtkgModel.createProperty(propertyUri);
-        if (predicate.getRight() instanceof Property) {
+        final Property property = this.dtkgModel.createProperty(propertyUri);
+        if (predicate.getRight() instanceof RdfProperty) {
             resourceToAdd.addProperty(
                     property,
-                    dtkgModel.createProperty(((Property) predicate.getRight()).getUri().orElse(""))
+                    dtkgModel.createProperty(((RdfProperty) predicate.getRight()).getUri().orElse(""))
             );
         } else if (predicate.getRight() instanceof BlankNode) {
             resourceToAdd.addProperty(
@@ -189,7 +208,7 @@ public class JenaDTKGEngine implements DTKGEngine {
         }
     }
 
-    private Resource addProperties(final Resource resourceToAdd, final List<Pair<Property, Node>> predicates) {
+    private Resource addProperties(final Resource resourceToAdd, final List<Pair<RdfProperty, Node>> predicates) {
         predicates.forEach(predicate -> addProperty(resourceToAdd, predicate));
         return resourceToAdd;
     }

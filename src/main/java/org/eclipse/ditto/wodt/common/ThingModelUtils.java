@@ -117,7 +117,7 @@ public final class ThingModelUtils {
                         for (Map.Entry<String, JsonElement> entry : contextObj.entrySet()) {
                             String alias = entry.getKey();
                             String contextUrl = entry.getValue().getAsString();
-                            addModelElement(contextExtensionsList, new ThingModelElement(alias, Optional.of(contextUrl), Optional.empty(), Optional.empty()));
+                            addModelElement(contextExtensionsList, new ThingModelElement(alias, Optional.of(contextUrl), Optional.empty()));
                         }
                     }
                 }
@@ -127,23 +127,21 @@ public final class ThingModelUtils {
             if (jsonObject.has("properties")) {
                 JsonObject properties = jsonObject.getAsJsonObject("properties");
                 for (String propertyKey : properties.keySet()) {
-                    JsonObject property = properties.getAsJsonObject(propertyKey);        
-                    Optional<String> type = property.has("@type") ? Optional.of(property.get("@type").getAsString()) : Optional.empty();
-                    Optional<String> domainPredicate = property.has(WoDTVocabulary.DOMAIN_PREDICATE.getUri())
-                        ? Optional.of(property.get(WoDTVocabulary.DOMAIN_PREDICATE.getUri()).getAsString()) : Optional.empty();
+                    JsonObject property = properties.getAsJsonObject(propertyKey);
+                    Optional<String> domainTag = property.has(WoDTVocabulary.DOMAIN_TAG.getUri())
+                        ? Optional.of(property.get(WoDTVocabulary.DOMAIN_TAG.getUri()).getAsString()) : Optional.empty();
                     if (property.has("properties")) {
                         // Complex properties
                         JsonObject subProperties = property.getAsJsonObject("properties");
                         for (String subPropertyKey : subProperties.keySet()) {
                             JsonObject subProperty = subProperties.getAsJsonObject(subPropertyKey);
-                            Optional<String> subType = subProperty.has("@type") ? Optional.of(subProperty.get("@type").getAsString()) : Optional.empty();
-                            Optional<String> subDomainPredicate = subProperty.has(WoDTVocabulary.DOMAIN_PREDICATE.getUri())
-                                ? Optional.of(subProperty.get(WoDTVocabulary.DOMAIN_PREDICATE.getUri()).getAsString()) : Optional.empty();
-                            addModelElement(propertiesList, new ThingModelElement(propertyKey + "_" + subPropertyKey, Optional.of(featureName), subType, subDomainPredicate));
+                            Optional<String> subDomainTag = subProperty.has(WoDTVocabulary.DOMAIN_TAG.getUri())
+                                ? Optional.of(subProperty.get(WoDTVocabulary.DOMAIN_TAG.getUri()).getAsString()) : Optional.empty();
+                            addModelElement(propertiesList, new ThingModelElement(propertyKey + "_" + subPropertyKey, Optional.of(featureName), subDomainTag));
                         }
                     } else {
                         // Simple properties
-                        addModelElement(propertiesList, new ThingModelElement(propertyKey, Optional.of(featureName), type, domainPredicate));
+                        addModelElement(propertiesList, new ThingModelElement(propertyKey, Optional.of(featureName), domainTag));
                     }
                 }
             }
@@ -153,8 +151,9 @@ public final class ThingModelUtils {
                 JsonObject actions = jsonObject.getAsJsonObject("actions");
                 for (String actionKey : actions.keySet()) {
                     JsonObject action = actions.getAsJsonObject(actionKey);
-                    Optional<String> type = action.has("@type") ? Optional.of(action.get("@type").getAsString()) : Optional.empty();
-                    addModelElement(actionsList, new ThingModelElement(actionKey, Optional.of(featureName), type, Optional.empty()));
+                    Optional<String> domainTag = action.has(WoDTVocabulary.DOMAIN_TAG.getUri())
+                            ? Optional.of(action.get(WoDTVocabulary.DOMAIN_TAG.getUri()).getAsString()) : Optional.empty();
+                    addModelElement(actionsList, new ThingModelElement(actionKey, Optional.of(featureName), domainTag));
                 }
             }
 
@@ -163,11 +162,11 @@ public final class ThingModelUtils {
                 JsonObject events = jsonObject.getAsJsonObject("events");
                 for (String eventKey : events.keySet()) {
                     JsonObject event = events.getAsJsonObject(eventKey);
-                    Optional<String> type = Optional.empty();
-                    if (event.has("data") && event.getAsJsonObject("data").has("type")) {
-                        type = Optional.of(event.getAsJsonObject("data").get("type").getAsString());
-                    }
-                    addModelElement(eventsList, new ThingModelElement(eventKey, Optional.of(featureName), type, Optional.empty()));
+//                    Optional<String> type = Optional.empty();
+//                    if (event.has("data") && event.getAsJsonObject("data").has("type")) {
+//                        type = Optional.of(event.getAsJsonObject("data").get("type").getAsString());
+//                    }
+                    addModelElement(eventsList, new ThingModelElement(eventKey, Optional.of(featureName),Optional.empty()));
                 }
             }
 

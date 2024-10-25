@@ -13,8 +13,8 @@
 package org.eclipse.ditto.wodt.common;
 
 import java.io.IOException;
+import java.net.URI;
 import java.nio.ByteBuffer;
-import java.util.Optional;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -24,9 +24,7 @@ import org.eclipse.ditto.client.DisconnectedDittoClient;
 import org.eclipse.ditto.client.DittoClient;
 import org.eclipse.ditto.client.DittoClients;
 import org.eclipse.ditto.client.configuration.BasicAuthenticationConfiguration;
-import org.eclipse.ditto.client.configuration.ClientCredentialsAuthenticationConfiguration;
 import org.eclipse.ditto.client.configuration.MessagingConfiguration;
-import org.eclipse.ditto.client.configuration.ProxyConfiguration;
 import org.eclipse.ditto.client.configuration.WebSocketMessagingConfiguration;
 import org.eclipse.ditto.client.live.internal.MessageSerializerFactory;
 import org.eclipse.ditto.client.live.messages.MessageSerializerRegistry;
@@ -45,14 +43,13 @@ import com.neovisionaries.ws.client.WebSocket;
  * Reads configuration properties and instantiates {@link org.eclipse.ditto.client.DittoClient}s.
  */
 public class DittoBase {
-
-    private static final ConfigProperties CONFIG_PROPERTIES = ConfigProperties.getInstance();
     private static final int TIMEOUT = 10;
     private final DittoClient client;
 
-    public DittoBase() {
+    public DittoBase(final URI dittoEndpoint, final String dittoUsername, final String dittoPassword) {
         try {
-            client = buildClient().connect().toCompletableFuture().get(TIMEOUT, TimeUnit.SECONDS);
+            client = buildClient(dittoEndpoint, dittoUsername, dittoPassword)
+                    .connect().toCompletableFuture().get(TIMEOUT, TimeUnit.SECONDS);
         } catch (final InterruptedException | ExecutionException | TimeoutException e) {
             throw new RuntimeException(e);
         }
@@ -62,48 +59,23 @@ public class DittoBase {
         return this.client;
     }
 
-    private DisconnectedDittoClient buildClient() {
-        final AuthenticationProvider<WebSocket> authenticationProvider = buildAuthenticationProvider();
+    private DisconnectedDittoClient buildClient(final URI dittoEndpoint, final String dittoUsername, final String dittoPassword) {
+        final AuthenticationProvider<WebSocket> authenticationProvider =
+                AuthenticationProviders.basic(BasicAuthenticationConfiguration.newBuilder()
+                        .username(dittoUsername)
+                        .password(dittoPassword)
+                        .build());
 
         final MessagingConfiguration.Builder messagingConfigurationBuilder =
                 WebSocketMessagingConfiguration.newBuilder()
                         .jsonSchemaVersion(JsonSchemaVersion.V_2)
                         .reconnectEnabled(false)
-                        .endpoint(CONFIG_PROPERTIES.getEndpointOrThrow());
-
-        proxyConfiguration().ifPresent(messagingConfigurationBuilder::proxyConfiguration);
+                        .endpoint(dittoEndpoint.toString());
 
         final MessagingProvider messagingProvider =
                 MessagingProviders.webSocket(messagingConfigurationBuilder.build(), authenticationProvider);
 
         return DittoClients.newInstance(messagingProvider, messagingProvider, messagingProvider, buildMessageSerializerRegistry());
-    }
-
-    private AuthenticationProvider<WebSocket> buildAuthenticationProvider() {
-        final AuthenticationProvider<WebSocket> authenticationProvider;
-
-        if (CONFIG_PROPERTIES.getUsername().isPresent()) {
-            authenticationProvider = AuthenticationProviders.basic(BasicAuthenticationConfiguration.newBuilder()
-                    .username(CONFIG_PROPERTIES.getUsernameOrThrow())
-                    .password(CONFIG_PROPERTIES.getPasswordOrThrow())
-                    .build());
-        } else if (CONFIG_PROPERTIES.getClientId().isPresent()) {
-            final ClientCredentialsAuthenticationConfiguration.ClientCredentialsAuthenticationConfigurationBuilder
-                    clientCredentialsAuthenticationConfigurationBuilder =
-                    ClientCredentialsAuthenticationConfiguration.newBuilder()
-                            .clientId(CONFIG_PROPERTIES.getClientIdOrThrow())
-                            .clientSecret(CONFIG_PROPERTIES.getClientSecretOrThrow())
-                            .tokenEndpoint(CONFIG_PROPERTIES.getTokenEndpointOrThrow());
-            final Optional<ProxyConfiguration> proxyConfiguration = proxyConfiguration();
-            proxyConfiguration.ifPresent(clientCredentialsAuthenticationConfigurationBuilder::proxyConfiguration);
-            authenticationProvider =
-                    AuthenticationProviders.clientCredentials(clientCredentialsAuthenticationConfigurationBuilder
-                            .build());
-        } else {
-            throw new IllegalStateException("No authentication configured in config.properties!");
-        }
-
-        return authenticationProvider;
     }
 
     private MessageSerializerRegistry buildMessageSerializerRegistry() {
@@ -127,23 +99,6 @@ public class DittoBase {
                         }));
 
         return messageSerializerRegistry;
-    }
-
-    private Optional<ProxyConfiguration> proxyConfiguration() {
-        final Optional<String> proxyHost = CONFIG_PROPERTIES.getProxyHost();
-        final Optional<String> proxyPort = CONFIG_PROPERTIES.getProxyPort();
-        if (proxyHost.isPresent() && proxyPort.isPresent()) {
-            final ProxyConfiguration.ProxyOptionalSettable builder = ProxyConfiguration.newBuilder()
-                    .proxyHost(proxyHost.get())
-                    .proxyPort(Integer.parseInt(proxyPort.get()));
-            final Optional<String> proxyPrincipal = CONFIG_PROPERTIES.getProxyPrincipal();
-            final Optional<String> proxyPassword = CONFIG_PROPERTIES.getProxyPassword();
-            if (proxyPrincipal.isPresent() && proxyPassword.isPresent()) {
-                builder.proxyUsername(proxyPrincipal.get()).proxyPassword(proxyPassword.get());
-            }
-            return Optional.of(builder.build());
-        }
-        return Optional.empty();
     }
 
     /**

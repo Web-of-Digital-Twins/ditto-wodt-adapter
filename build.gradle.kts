@@ -16,10 +16,13 @@ repositories {
 
 dependencies {
     implementation(libs.ditto.client)
+    implementation(libs.ditto.wot.model)
     implementation(libs.jackson.databind)
     implementation(libs.jackson.dataformat.yaml)
     implementation(libs.javalin)
     implementation(libs.jena)
+    implementation(libs.slf4j.api)
+    implementation(libs.slf4j.simple)
     implementation(libs.wot.servient)
     testImplementation(libs.bundles.java.testing)
     testRuntimeOnly(libs.junit.engine)
@@ -36,4 +39,8 @@ tasks.withType<Test> {
         events(*org.gradle.api.tasks.testing.logging.TestLogEvent.values())
         exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
     }
+}
+
+application {
+    mainClass.set("org.eclipse.ditto.wodt.WoDTAdapter")
 }

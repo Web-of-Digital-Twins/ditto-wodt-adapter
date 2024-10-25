@@ -15,7 +15,7 @@ import org.eclipse.ditto.wodt.model.ontology.DTOntology;
 import org.eclipse.ditto.wodt.model.ontology.Individual;
 import org.eclipse.ditto.wodt.model.ontology.Literal;
 import org.eclipse.ditto.wodt.model.ontology.Node;
-import org.eclipse.ditto.wodt.model.ontology.Property;
+import org.eclipse.ditto.wodt.model.ontology.RdfProperty;
 
 public final class OntologyManagerImpl implements DTOntology, OntologyManager {
     
@@ -41,37 +41,10 @@ public final class OntologyManagerImpl implements DTOntology, OntologyManager {
     }
 
     @Override
-    public Optional<Property> obtainProperty(String rawProperty) {
-        Map<String, Pair<String, String>> predicates = getMergedPropertiesAndRelationships();
-        return Optional.ofNullable(predicates.get(rawProperty))
-            .map(pair -> new Property(pair.getLeft()));
-    }
-
-    @Override
-    public Optional<String> obtainPropertyValueType(String rawProperty) {
-        Map<String, Pair<String, String>> predicates = getMergedPropertiesAndRelationships();
-        return Optional.ofNullable(predicates.get(rawProperty))
-            .map(Pair::getRight);
-    }
-
-    @Override
-    public <T> Optional<Pair<Property, Node>> convertPropertyValue(String rawProperty, T value) {
-        Map<String, Pair<String, String>> propertiesMap = getMergedPropertiesAndRelationships();
-        return Optional.ofNullable(propertiesMap.get(rawProperty))
-            .map(pair -> Pair.of(new Property(pair.getLeft()), new Literal<>(value)));
-    }
-
-    @Override
-    public Optional<Pair<Property, Individual>> convertRelationship(String rawRelationship, String targetUri) {
-        Map<String, Pair<String, String>> relationshipsMap = getMergedPropertiesAndRelationships();
-        return Optional.ofNullable(relationshipsMap.get(rawRelationship))
-            .map(pair -> Pair.of(new Property(pair.getLeft()), new Individual(targetUri)));
-    }
-
-    @Override
-    public Optional<String> obtainActionType(String rawAction) {
-        Map<String, String> mergedActions = getMergedActions();
-        return Optional.ofNullable(mergedActions.get(rawAction));
+    public Optional<String> getDomainTag(String rawElement) {
+        Map<String, String> domainTags = getMergedPropertiesAndRelationships();
+        domainTags.putAll(getMergedActions());
+        return Optional.ofNullable(domainTags.get(rawElement));
     }
 
     @Override
@@ -79,13 +52,27 @@ public final class OntologyManagerImpl implements DTOntology, OntologyManager {
         Map<String, String> mergedEvents = getMergedEvents();
         return Optional.ofNullable(mergedEvents.get(rawEvent));
     }
+
+    @Override
+    public <T> Optional<Pair<RdfProperty, Node>> mapPropertyData(String rawProperty, T value) {
+        Map<String, String> propertiesMap = getMergedPropertiesAndRelationships();
+        return Optional.ofNullable(propertiesMap.get(rawProperty))
+            .map(domainTag -> Pair.of(new RdfProperty(domainTag), new Literal<>(value)));
+    }
+
+    @Override
+    public Optional<Pair<RdfProperty, Individual>> mapRelationshipInstance(String rawRelationship, String targetUri) {
+        Map<String, String> relationshipsMap = getMergedPropertiesAndRelationships();
+        return Optional.ofNullable(relationshipsMap.get(rawRelationship))
+            .map(domainTag -> Pair.of(new RdfProperty(domainTag), new Individual(targetUri)));
+    }
     
-    private Map<String, Pair<String, String>> getMergedPropertiesAndRelationships() {
-        Map<String, Pair<String, String>> mergedMap = new HashMap<>();
+    private Map<String, String> getMergedPropertiesAndRelationships() {
+        Map<String, String> mergedMap = new HashMap<>();
         thingModelUtils.getTMProperties().forEach(element -> {
             mergedMap.put(
                 element.getField(),
-                Pair.of(element.getDomainPredicate().orElse(""), element.getType().orElse(""))
+                element.getDomainTag().orElse("")
             );
         });
         
@@ -93,13 +80,8 @@ public final class OntologyManagerImpl implements DTOntology, OntologyManager {
             handler.getProperties().stream().forEach(properties -> {
                 properties.ifPresent(prop -> {
                     String name = prop.get("name");
-                    String domainPredicate = prop.get("domainPredicate");
-                    String type = prop.get("type");
-                    mergedMap.merge(name, Pair.of(domainPredicate, type), (existing, newValue) -> {
-                        String mergedDomainPredicate = newValue.getLeft() != null ? newValue.getLeft() : existing.getLeft();
-                        String mergedType = newValue.getRight() != null ? newValue.getRight() : existing.getRight();
-                        return Pair.of(mergedDomainPredicate, mergedType);
-                    });
+                    String domainTag = prop.get("domainTag");
+                    mergedMap.merge(name, domainTag, (existing, newValue) -> newValue);
                 });
             })
         );
@@ -109,16 +91,15 @@ public final class OntologyManagerImpl implements DTOntology, OntologyManager {
     private Map<String, String> getMergedActions() {
         Map<String, String> mergedActions = new HashMap<>();
         thingModelUtils.getTMActions().forEach(element -> {
-            mergedActions.put(element.getField(), element.getType().orElse(""));
+            mergedActions.put(element.getField(), element.getDomainTag().orElse(""));
         });
         
         yamlOntologyHandler.ifPresent(handler ->
             handler.getActions().stream().forEach(actions -> {
                 actions.ifPresent(action -> {
                     String name = action.get("name");
-                    String type = action.get("type");
-                    mergedActions.merge(name, type, (existing, newValue) -> 
-                        newValue != null ? newValue : existing);
+                    String type = action.get("domainTag");
+                    mergedActions.merge(name, type, (existing, newValue) -> newValue);
                 });
             })
         );
@@ -128,16 +109,15 @@ public final class OntologyManagerImpl implements DTOntology, OntologyManager {
     private Map<String, String> getMergedEvents() {
         Map<String, String> mergedEvents = new HashMap<>();
         thingModelUtils.getTMEvents().forEach(element -> {
-            mergedEvents.put(element.getField(), element.getType().orElse(""));
+            mergedEvents.put(element.getField(), element.getDomainTag().orElse(""));
         });
         
         yamlOntologyHandler.ifPresent(handler ->
             handler.getEvents().stream().forEach(events -> {
                 events.ifPresent(event -> {
                     String name = event.get("name");
-                    String type = event.get("type");
-                    mergedEvents.merge(name, type, (existing, newValue) -> 
-                        newValue != null ? newValue : existing);
+                    String domainTag = event.get("domainTag");
+                    mergedEvents.merge(name, domainTag, (existing, newValue) -> newValue);
                 });
             })
         );
@@ -151,17 +131,15 @@ public final class OntologyManagerImpl implements DTOntology, OntologyManager {
 
     @Override
     public List<ThingModelElement> getAvailableProperties() {
-        Map<String, Pair<String, String>> mergedPropertiesAndRelationships = getMergedPropertiesAndRelationships();
+        Map<String, String> mergedPropertiesAndRelationships = getMergedPropertiesAndRelationships();
         List<ThingModelElement> propertiesList = new ArrayList<>();
         thingModelUtils.getTMProperties().forEach(element -> {
             String field = element.getField();
             String featureName = element.getFeature().orElse("");
             
             if (mergedPropertiesAndRelationships.containsKey(field)) {
-                String domainPredicate = mergedPropertiesAndRelationships.get(field).getLeft();
-                String type = mergedPropertiesAndRelationships.get(field).getRight();
-                propertiesList.add(new ThingModelElement(field, Optional.of(featureName),
-                    Optional.of(type), Optional.of(domainPredicate)));
+                String domainTag = mergedPropertiesAndRelationships.get(field);
+                propertiesList.add(new ThingModelElement(field, Optional.of(featureName), Optional.of(domainTag)));
             } else {
                 propertiesList.add(element);
             }
@@ -185,10 +163,8 @@ public final class OntologyManagerImpl implements DTOntology, OntologyManager {
                 optionalMap.ifPresent(property -> {
                     String name = property.get("name");
                     if (name.startsWith("rel-")) {
-                        String domainPredicate = property.get("domainPredicate");
-                        String type = property.get("type");
-                        relationshipsList.add(new ThingModelElement(name, Optional.empty(),
-                            Optional.ofNullable(type), Optional.ofNullable(domainPredicate)));
+                        String domainTag = property.get("domainTag");
+                        relationshipsList.add(new ThingModelElement(name, Optional.empty(), Optional.ofNullable(domainTag)));
                     }
                 });
             })
@@ -205,9 +181,9 @@ public final class OntologyManagerImpl implements DTOntology, OntologyManager {
             String featureName = element.getFeature().orElse("");
             
             if (mergedActions.containsKey(field)) {
-                String type = mergedActions.get(field);
+                String domainTag = mergedActions.get(field);
                 actionsList.add(new ThingModelElement(field, Optional.of(featureName),
-                    Optional.of(type), Optional.empty()));
+                    Optional.of(domainTag)));
             } else {
                 actionsList.add(element);
             }
@@ -225,9 +201,9 @@ public final class OntologyManagerImpl implements DTOntology, OntologyManager {
             String featureName = element.getFeature().orElse("");
 
             if (mergedEvents.containsKey(field)) {
-                String type = mergedEvents.get(field);
+                String domainTag = mergedEvents.get(field);
                 eventsList.add(new ThingModelElement(field, Optional.of(featureName),
-                    Optional.of(type), Optional.empty()));
+                    Optional.of(domainTag)));
             } else {
                 eventsList.add(element);
             }
@@ -235,5 +211,4 @@ public final class OntologyManagerImpl implements DTOntology, OntologyManager {
 
         return eventsList;
     }
-
 }

@@ -1,5 +1,6 @@
 package org.eclipse.ditto.wodt.WoDTShadowingAdapter.impl;
 
+import java.net.URI;
 import java.util.concurrent.CountDownLatch;
 
 import org.eclipse.ditto.wodt.common.DittoBase;
@@ -7,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /*
- * This class hanlde a Ditto Client that listen to Thing changes and messages.
+ * This class handle a Ditto Client that listen to Thing changes and messages.
  */
 public class DittoThingListener extends Thread {
 
@@ -17,10 +18,14 @@ public class DittoThingListener extends Thread {
     private final DittoBase client;
     private final WoDTDigitalAdapter woDTDigitalAdapter;
 
-    public DittoThingListener(WoDTDigitalAdapter woDTDigitalAdapter) {
+    public DittoThingListener(final URI dittoEndpoint,
+                              final String dittoUsername,
+                              final String dittoPassword,
+                              WoDTDigitalAdapter woDTDigitalAdapter
+    ) {
         super();
         this.woDTDigitalAdapter = woDTDigitalAdapter;
-        this.client = new DittoBase();
+        this.client = new DittoBase(dittoEndpoint, dittoUsername, dittoPassword);
     }
 
     @Override

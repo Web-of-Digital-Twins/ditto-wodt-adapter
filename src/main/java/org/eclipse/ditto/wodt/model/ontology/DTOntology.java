@@ -33,21 +33,12 @@ public interface DTOntology {
     String getDigitalTwinType();
 
     /**
-     * Obtain the ontology property from the rawProperty in input.
-     * If the mapping cannot be done it will return an empty optional.
-     * It is valid both for dt properties and dt relationships.
-     * @param rawProperty the input raw property
-     * @return the Property instance
+     * Get the Domain Tag of a Digital Twin property, relationship or action.
+     * If the property/relationship/action is not present, returns an empty {@link Optional}
+     * @param rawElement the Digital Twin property/relationship/action name for which obtain the corresponding Domain Tag
+     * @return the Domain Tag of the Digital Twin property/relationship/action
      */
-    Optional<Property> obtainProperty(String rawProperty);
-
-    /**
-     * Obtain the semantic type of the value for a rawProperty.
-     * It is valid both for dt properties and dt relationships.
-     * @param rawProperty the input raw property
-     * @return an optional for the type of the value of the property
-     */
-    Optional<String> obtainPropertyValueType(String rawProperty);
+    Optional<String> getDomainTag(String rawElement);
 
     /**
      * Convert a raw property and its value to the ontology model.
@@ -57,7 +48,7 @@ public interface DTOntology {
      * @return an optional that is filled with the Pair of the mapped Property and its mapped value if possible
      * @param <T> the type of the value
      */
-    <T> Optional<Pair<Property, Node>> convertPropertyValue(String rawProperty, T value);
+    <T> Optional<Pair<RdfProperty, Node>> mapPropertyData(String rawProperty, T value);
 
     /**
      * Convert a raw relationship and its target uri to the ontology model.
@@ -66,14 +57,7 @@ public interface DTOntology {
      * @param targetUri the target uri of the relationship
      * @return an optional that is filled with the Pair of the mapped Property and its mapped target uri if possible
      */
-    Optional<Pair<Property, Individual>> convertRelationship(String rawRelationship, String targetUri);
-
-    /**
-     * Obtain the semantic type that describe the action.
-     * @param rawAction the input rawAction to get the semantic type
-     * @return an optional with the type of the action
-     */
-    Optional<String> obtainActionType(String rawAction);
+    Optional<Pair<RdfProperty, Individual>> mapRelationshipInstance(String rawRelationship, String targetUri);
 
     /*
      * Obtain the semantic type that describe the event.
