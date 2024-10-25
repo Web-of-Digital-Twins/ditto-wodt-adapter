@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /*
- * This class hanlde a Ditto Client that listen to Thing changes and messages.
+ * This class handle a Ditto Client that listen to Thing changes and messages.
  */
 public class DittoThingListener extends Thread {
 
