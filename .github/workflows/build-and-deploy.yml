@@ -1,0 +1,107 @@
+name: Build & Deploy
+
+on:
+  push:
+    paths-ignore:
+      - '.gitignore'
+      - '.mergify.yml'
+      - 'CHANGELOG.md'
+      - 'LICENSE'
+      - 'README.md'
+      - 'renovate.json'
+  pull_request:
+
+jobs:
+  validation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+      - name: Validate the Gradle Wrapper
+        uses: gradle/wrapper-validation-action@v3.5.0
+
+  build:
+    needs:
+      - validation
+    strategy:
+        matrix:
+          os: [ubuntu, macos, windows]
+          java-version: [17, 21]
+    runs-on: ${{ matrix.os }}-latest
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ matrix.java-version }}
+          distribution: adopt
+      - name: Run quality assurance and test with coverage
+        run: ./gradlew clean check
+      - name: CodeCov
+        if: ${{ contains('Linux', runner.os) }}
+        uses: codecov/codecov-action@v4.6.0
+        with:
+          directory: "build/reports/jacoco"
+
+  release-and-delivery:
+    permissions:
+      packages: write
+    concurrency:
+        # Allow only one release at a time.
+        group: release-and-delivery-${{ github.event.number || github.ref }}
+    needs:
+      - build
+    runs-on: ubuntu-latest
+    outputs:
+      release-status: ${{ env.release_status }}
+    # Release only where secrets are available.
+    if: >-
+      !github.event.repository.fork
+      && (
+        github.event_name != 'pull_request'
+        || github.event.pull_request.head.repo.full_name == github.repository
+      )
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - name: Find the version of Node from package.json
+        id: node-version
+        run: echo "version=$(jq -r .engines.node package.json)" >> $GITHUB_OUTPUT
+      - name: Install Node
+        uses: actions/setup-node@v4.1.0
+        with:
+          node-version: ${{ steps.node-version.outputs.version }}
+      - name: Release and container delivery
+        uses: AndreaGiulianelli/release-and-delivery-action@1.0.11
+        with:
+          should-release: true
+          release-command: |
+            npm install
+            npx semantic-release
+          should-build-and-deliver-container: true
+          container-registry-name: 'ghcr.io'
+          container-registry-username: ${{ github.actor }}
+          container-registry-password: ${{ secrets.GITHUB_TOKEN }}
+          github-token: ${{ secrets.DEPLOYMENT_TOKEN }}
+          
+  success:
+    runs-on: ubuntu-latest
+    needs:
+      - validation
+      - build
+      - release-and-delivery
+    if: >-
+      always() && (
+        contains(join(needs.*.result, ','), 'failure')
+        || !contains(join(needs.*.result, ','), 'cancelled')
+      )
+    steps:
+      - name: Verify that there were no failures
+        run: ${{ !contains(join(needs.*.result, ','), 'failure') }}
