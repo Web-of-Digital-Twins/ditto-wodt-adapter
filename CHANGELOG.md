@@ -1,3 +1,14 @@
+## [1.0.1](https://github.com/Web-of-Digital-Twins/ditto-wodt-adapter/compare/1.0.0...1.0.1) (2024-10-28)
+
+### Bug Fixes
+
+* correct check of environment variables ([023b3bf](https://github.com/Web-of-Digital-Twins/ditto-wodt-adapter/commit/023b3bf8c66eaadd5061992df1386e8c5a734774))
+
+### General maintenance
+
+* add ontology configuration example ([3df80da](https://github.com/Web-of-Digital-Twins/ditto-wodt-adapter/commit/3df80da16ffe4caaf48d5c8e4d16e532c30bdd1e))
+* update README ([7d7d871](https://github.com/Web-of-Digital-Twins/ditto-wodt-adapter/commit/7d7d87176bfb1a3abc5cb4590f4ba6a4f306b90b))
+
 ## 1.0.0 (2024-10-27)
 
 ### ⚠ BREAKING CHANGES
