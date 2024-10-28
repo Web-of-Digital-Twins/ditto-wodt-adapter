@@ -1,8 +1,8 @@
 package org.eclipse.ditto.wodt.config;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 /**
  * The Configuration Loader implementation based on Environment Variables.
@@ -24,7 +24,7 @@ public class EnvironmentConfigurationLoader implements ConfigurationLoader{
      * Default constructor.
      */
     public EnvironmentConfigurationLoader() {
-        final boolean isAMandatoryVariableMissing = Stream.of(DITTO_URL_VARIABLE,
+        List.of(DITTO_URL_VARIABLE,
                 DITTO_OBSERVATION_ENDPOINT_VARIABLE,
                 DITTO_USERNAME_VARIABLE,
                 DITTO_PASSWORD_VARIABLE,
@@ -33,11 +33,11 @@ public class EnvironmentConfigurationLoader implements ConfigurationLoader{
                 PA_ID_VARIABLE,
                 DT_URI_VARIABLE,
                 DT_EXPOSED_PORT_VARIABLE,
-                DT_VERSION_VARIABLE).anyMatch(variable -> System.getenv(variable) == null);
-
-        if (isAMandatoryVariableMissing) {
-            throw new IllegalStateException("Please specify all the mandatory environment variables");
-        }
+                DT_VERSION_VARIABLE).forEach(variable -> {
+                    if (System.getenv(variable) == null) {
+                        throw new IllegalStateException("Please specify the " + variable + " environment variable");
+                    }
+        });
     }
 
     @Override
