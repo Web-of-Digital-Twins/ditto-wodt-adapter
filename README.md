@@ -1,44 +1,41 @@
-# Eclipse Ditto WoDT Integration
-An integration for Eclipse Ditto that allows a Ditto Thing to be used as a Digital Twin in a WoDT Platform of the Web of Digital Twins.
+# Ditto Web of Digital Twins Adapter
 
-## Requirements
-In order to use this integration you will need:
-- Ditto instance running in a Docker container
-- Java
+![Release](https://github.com/Web-of-Digital-Twins/ditto-wodt-adapter/actions/workflows/build-and-deploy.yml/badge.svg?style=plastic)
+[![License: Apache License](https://img.shields.io/badge/License-Apache_License_2.0-yellow.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+![Version](https://img.shields.io/github/v/release/Web-of-Digital-Twins/ditto-wodt-adapter?style=plastic)
 
-Note: some libraries such as "wot-servient" may have to be imported manually.
+A simple middleware prototype that allows to expose [Eclipse Ditto](https://eclipse.dev/ditto/) Digital Twins (or Things) as HWoDT-compliant DTs.
 
-## Configuration
+## Usage
+### 1. Start Eclipse Ditto
+First of all you need to start Eclipse Ditto, for example via Docker Compose, and create the Ditto Thing you want to expose as a WoDT Digital Twin.
 
-The module is preconfigured to work with a local Eclipse Ditto running in Docker. Find more information on
-[GitHub](https://github.com/eclipse/ditto/tree/master/deployment/docker).
+### 2. Configuration
+Before starting the adapter you need to create a `.yml` file that contains the ontology mappings. You can find an example in [src/main/resources/ontology_example.yml](https://github.com/Web-of-Digital-Twins/ditto-wodt-adapter/blob/main/src/main/resources/ontology_example.yaml).
+Alternatively, the configuration of the _domain tags_ can be equally achieved by setting them directly when creating the Ditto Thing in Eclipse Ditto, specifying a _Thing Model_ like the one in [this example](https://gist.github.com/AndreaGiulianelli/4047cacbb5a2bf1691ce11959ea94eb6).
 
-You can change the configuration to your liking by editing `resources/config.properties`.
-The configured usernames and passwords must be added to the nginx.htpasswd of Eclipse Ditto.
+Then, to start the adapter, you need to specify the following environment variables:
+- `DITTO_URL`: the URL of the Eclipse Ditto instance.
+- `DITTO_OBSERVATION_ENDPOINT`: the WebSocket endpoint of the Eclipse Ditto instance.
+- `DITTO_USERNAME`: the username of a valid user on the Eclipse Ditto instance.
+- `DITTO_PASSWORD`: the corresponding password of the user on the Eclipse Ditto instance.
+- `DITTO_THING_ID`: the Eclipse Ditto Thing ID to expose as a WoDT DT.
+- `YAML_ONTOLOGY_PATH`: the path of the ontology configuration.
+- `PLATFORM_URI`: [**optional**] the WoDT Platform URI to automatically register in, if present. 
+- `PHYSICAL_ASSET_ID`: the ID of the corresponding Physical Asset.
+- `DIGITAL_TWIN_URI`: the Digital Twin URI that will be exposed (it includes also the final exposed port).
+- `DIGITAL_TWIN_EXPOSED_PORT`: the port to actually expose for the adapter.
+- `DIGITAL_TWIN_VERSION`: the version of the Digital Twin to expose.
 
-```bash
-htpasswd nginx.htpasswd user1
-```
-You can also specify the URI and port where the module will be exposed.
-
-## To integrate a Ditto Thing:
-You can integrate a Ditto Thing in two ways:
-- by creating it with a modified Thing Model, which will contain some additional properties for ontology mapping ([example](https://gist.githubusercontent.com/piertv21/7555d9c936d9ce25db3a23ec4b0e580a/raw/551d2c7f08bdb539baa800908752e36b8a0e285f/ambulance-1.0.0.tm.jsonld))
-- by creating it with a standard Thing Model, you will need to provide an ontology mapping in YAML format to the module ([example](https://github.com/piertv21/ditto_wodt_integration/blob/main/src/test/resources/BulbHolderDTOntology.yaml))
-
-After creating the Ditto thing you can start the module. If you need to provide your ontology mapping in YAML indicate the path where it is saved when you instantiate the module.
-
-Module instantiation example:
-```java
-WoDTAdapter woDTAdapter = WoDTAdapter.create(
-  "io.eclipseprojects.ditto:ambulance",
-  "AmbulanceDTOntology.yaml",
-  "http://localhost:5000",
-  "bulbHolderPhysicalAssetId"
-);
-```
-Parameters:
-- **Ditto thing id**: the id of your Ditto thing created in Eclipse Ditto.
-- **Mapping in YAML**: path to your ontology mapping created in YAML.
-- **WoDT platform URIs**: URI of the WoDT platforms to register to.
-- **Physical asset id**: id of the physical asset associated with the Digital Twin.
+### 3. Adapter start
+You can start the adapter using the provided docker image. To start it via a docker container you need to:
+1. Provide a `.env` file with all the environment variables described above
+2. Run the container with the command:
+   ```bash
+   docker run ghcr.io/web-of-digital-twins/ditto-wodt-adapter:<version>
+   ```
+   1. Provide a port mapping to the `DIGITAL_TWIN_EXPOSED_PORT`.
+   2. Create a volume to pass the ontology file. 
+   3. If you want to pass an environment file whose name is different from `.env` use the `--env-file <name>` parameter.
+    
+Alternatively, you can obviously start the adapter directly via Gradle.
