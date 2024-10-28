@@ -1,0 +1,13 @@
+digitalTwinType: "https://lampontology.com/Lamp"
+
+properties:
+  - name: "isOn"
+    domainTag: "https://lampontology.com/isOn"
+
+relationships:
+  - name: "rel-is_part_of_room"
+    domainTag: "https://lampontology.com/isInRoom"
+
+actions:
+  - name: "switch"
+    domainTag: "https://lampontology.com/Switch"
