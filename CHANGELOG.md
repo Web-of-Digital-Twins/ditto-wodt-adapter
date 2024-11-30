@@ -1,3 +1,13 @@
+## [1.1.0](https://github.com/Web-of-Digital-Twins/ditto-wodt-adapter/compare/1.0.1...1.1.0) (2024-11-30)
+
+### Features
+
+* align with new platform registration notification ([c25061a](https://github.com/Web-of-Digital-Twins/ditto-wodt-adapter/commit/c25061a924b5a90da1049d7d101c8367252eeed9))
+
+### Refactoring
+
+* move to new package ([191073b](https://github.com/Web-of-Digital-Twins/ditto-wodt-adapter/commit/191073b3a01c1206492fe327e69895547388e631))
+
 ## [1.0.1](https://github.com/Web-of-Digital-Twins/ditto-wodt-adapter/compare/1.0.0...1.0.1) (2024-10-28)
 
 ### Bug Fixes
