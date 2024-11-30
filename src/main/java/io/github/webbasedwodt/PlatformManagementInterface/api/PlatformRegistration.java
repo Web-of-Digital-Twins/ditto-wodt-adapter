@@ -21,25 +21,39 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * Presenter class to be able to deserialize platform registration data from the API.
-* It contains the self field where the WoDT Digital Twins Platform send its URL.
-*/
+ * It contains the self field where the WoDT Digital Twins Platform send its URL.
+ */
 public final class PlatformRegistration {
     private final String self;
+    private final String dtUri;
 
     /**
      * Default constructor.
-    * @param self the field where the WoDT Platform send its URL
-    */
+     * @param self the field where the WoDT Platform send its URL
+     * @param dtUri the uri of this dt, that has been registered
+     */
     @JsonCreator
-    public PlatformRegistration(@JsonProperty("self") final String self) {
+    public PlatformRegistration(
+            @JsonProperty("self") final String self,
+            @JsonProperty("dtUri") final String dtUri
+    ) {
         this.self = self;
+        this.dtUri = dtUri;
     }
 
     /**
      * Obtain the url of the Platform that added the DT.
-    * @return the Platform url
-    */
+     * @return the Platform url
+     */
     public String getSelf() {
         return this.self;
+    }
+
+    /**
+     * Obtain the dtUri of the registered DT.
+     * @return the dt uri
+     */
+    public String getDtUri() {
+        return this.dtUri;
     }
 }
