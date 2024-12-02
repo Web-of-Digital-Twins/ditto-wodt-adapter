@@ -1,3 +1,9 @@
+## [1.1.1](https://github.com/Web-of-Digital-Twins/ditto-wodt-adapter/compare/1.1.0...1.1.1) (2024-12-02)
+
+### Bug Fixes
+
+* correct entry point in build ([1efe31d](https://github.com/Web-of-Digital-Twins/ditto-wodt-adapter/commit/1efe31d934dae8a35052d37347461cb3de54cce6))
+
 ## [1.1.0](https://github.com/Web-of-Digital-Twins/ditto-wodt-adapter/compare/1.0.1...1.1.0) (2024-11-30)
 
 ### Features
