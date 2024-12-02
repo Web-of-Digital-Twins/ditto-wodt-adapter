@@ -42,5 +42,5 @@ tasks.withType<Test> {
 }
 
 application {
-    mainClass.set("org.eclipse.ditto.wodt.WoDTAdapter")
+    mainClass.set("io.github.webbasedwodt.WoDTAdapter")
 }
