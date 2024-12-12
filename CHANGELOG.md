@@ -1,3 +1,15 @@
+## [1.1.2](https://github.com/Web-of-Digital-Twins/ditto-wodt-adapter/compare/1.1.1...1.1.2) (2024-12-12)
+
+### Bug Fixes
+
+* set dt see other location correctly when dereferenced from its uri ([99e4b11](https://github.com/Web-of-Digital-Twins/ditto-wodt-adapter/commit/99e4b1158443f28ce00fa689d7c0dc6caab78727))
+* set relative urls correctly ([59a1f6b](https://github.com/Web-of-Digital-Twins/ditto-wodt-adapter/commit/59a1f6bc1206b5d3d0eb882909abbf186e7c3bef))
+* set the dtd link header correctly with respect to dtkg url ([103a4c3](https://github.com/Web-of-Digital-Twins/ditto-wodt-adapter/commit/103a4c3437067513bf80d874784f72b3097c35c2))
+
+### General maintenance
+
+* add uri utils ([a1e9c78](https://github.com/Web-of-Digital-Twins/ditto-wodt-adapter/commit/a1e9c785425dc6c4d5a98d8ec62657cb43ec3ad8))
+
 ## [1.1.1](https://github.com/Web-of-Digital-Twins/ditto-wodt-adapter/compare/1.1.0...1.1.1) (2024-12-02)
 
 ### Bug Fixes
