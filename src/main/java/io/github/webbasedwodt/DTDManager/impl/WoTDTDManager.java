@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import io.github.webbasedwodt.common.UriUtil;
 import org.eclipse.ditto.json.JsonObject;
 import org.eclipse.ditto.json.JsonObjectBuilder;
 import io.github.webbasedwodt.DTDManager.api.DTDManager;
@@ -81,7 +82,7 @@ public class WoTDTDManager implements DTDManager {
         final PlatformManagementInterfaceReader platformManagementInterfaceReader
     ) {
         this.configuration = configuration;
-        this.dittoBaseUrl = this.configuration.getDittoUrl().resolve("/api/2/things/").toString();
+        this.dittoBaseUrl = UriUtil.uriRelativeResolve(this.configuration.getDittoUrl(), "/api/2/things/").toString();
         this.dittoThingId = configuration.getDittoThing().getEntityId().get().toString();
         this.digitalTwinUri = configuration.getDigitalTwinUri();
         this.ontology = configuration.getOntology();
@@ -162,7 +163,7 @@ public class WoTDTDManager implements DTDManager {
                 .setType("application/tm+json")
                 .build());
         links.add(Link.newBuilder()
-                .setHref(IRI.of(this.digitalTwinUri.resolve("/dtkg").toString()))
+                .setHref(IRI.of(UriUtil.uriRelativeResolve(this.digitalTwinUri, "dtkg").toString()))
                 .setRel(WoDTVocabulary.DTKG.getUri())
                 .build());
 
@@ -190,9 +191,12 @@ public class WoTDTDManager implements DTDManager {
                 .setActions(Actions.from(this.actions.values()))
                 .setForms(List.of(RootFormElement.newBuilder()
                         .setHref(IRI.of(
-                                URI.create(this.digitalTwinUri.toString().replaceFirst("([a-zA-Z][a-zA-Z0-9+.-]*):", "ws:"))
-                                        .resolve("/dtkg")
-                                        .toString()
+                                UriUtil.uriRelativeResolve(
+                                    URI.create(
+                                        this.digitalTwinUri.toString().replaceFirst("([a-zA-Z][a-zA-Z0-9+.-]*):", "ws:")
+                                    ),
+                                    "dtkg"
+                                ).toString()
                         ))
                         .setSubprotocol("websocket")
                         .setOp(SingleRootFormElementOp.OBSERVEALLPROPERTIES)

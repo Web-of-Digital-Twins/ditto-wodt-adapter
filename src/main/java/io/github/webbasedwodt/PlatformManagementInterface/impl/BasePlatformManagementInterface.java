@@ -20,19 +20,18 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import io.github.webbasedwodt.PlatformManagementInterface.api.PlatformManagementInterface;
+import io.github.webbasedwodt.common.UriUtil;
 
 /**
  * Base implementation of the {@link PlatformManagementInterface}.
 */
 public class BasePlatformManagementInterface implements PlatformManagementInterface {
-    private static final String PATH_TO_PLATFORM_WODT = "/wodt";
+    private static final String PATH_TO_PLATFORM_WODT = "wodt";
     private static final int ACCEPTED_REQUEST_STATUS_CODE = 202;
     private final URI digitalTwinUri;
     private final Set<URI> platforms;
@@ -72,7 +71,7 @@ public class BasePlatformManagementInterface implements PlatformManagementInterf
         final HttpClient httpClient = HttpClient.newHttpClient();
         this.platforms.forEach(platformUrl -> {
             final HttpRequest httpRequest = HttpRequest.newBuilder()
-                    .uri(getPlatformWoDT(platformUrl, this.digitalTwinUri.toString()))
+                    .uri(getPlatformCachedDT(platformUrl, this.digitalTwinUri.toString()))
                     .DELETE()
                     .build();
             httpClient.sendAsync(httpRequest, HttpResponse.BodyHandlers.ofString());
@@ -80,13 +79,12 @@ public class BasePlatformManagementInterface implements PlatformManagementInterf
         this.platforms.clear();
     }
 
-    private URI getPlatformWoDT(final URI platformUrl, final String... path) {
-        if (path.length > 0) {
-            return platformUrl.resolve(
-                    PATH_TO_PLATFORM_WODT
-                            + Arrays.stream(path).collect(Collectors.joining("/", "/", "")));
-        }
-        return platformUrl.resolve(PATH_TO_PLATFORM_WODT);
+    private URI getPlatformWoDT(final URI platformUrl) {
+        return UriUtil.uriRelativeResolve(platformUrl, PATH_TO_PLATFORM_WODT);
+    }
+
+    private URI getPlatformCachedDT(final URI platformUrl, final String resource) {
+        return URI.create(getPlatformWoDT(platformUrl) + "/" + resource);
     }
 
     @Override
