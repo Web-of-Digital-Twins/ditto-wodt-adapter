@@ -1,0 +1,15 @@
+io.github.webbasedwodt
+io.github.webbasedwodt.common
+io.github.webbasedwodt.common.model
+io.github.webbasedwodt.config
+io.github.webbasedwodt.DTDManager.api
+io.github.webbasedwodt.DTDManager.impl
+io.github.webbasedwodt.DTKGEngine.api
+io.github.webbasedwodt.DTKGEngine.impl
+io.github.webbasedwodt.ontology
+io.github.webbasedwodt.PlatformManagementInterface.api
+io.github.webbasedwodt.PlatformManagementInterface.impl
+io.github.webbasedwodt.WoDTDigitalTwinInterface.api
+io.github.webbasedwodt.WoDTDigitalTwinInterface.impl
+io.github.webbasedwodt.WoDTShadowingAdapter.api
+io.github.webbasedwodt.WoDTShadowingAdapter.impl
