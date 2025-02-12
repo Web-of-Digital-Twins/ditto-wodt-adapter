@@ -1,0 +1,134 @@
+openapi: 3.0.0
+servers:
+  - description: WoDT Digital Twin API - Eclipse Ditto WoDT Adapter
+    url: http://localhost:<port>
+info:
+  description: This is the API of exposed by the WoDT Digital Twin
+  version: 1.0.0
+  title: WoDT Digital Twin API - Eclipse Ditto WoDT Adapter
+  contact:
+    email: andrea.giulianelli7@unibo.it
+  license:
+    name: Apache 2.0 License
+    url: 'https://www.apache.org/licenses/LICENSE-2.0'
+
+tags:
+  - name: WoDT Digital Twin Interface API
+    description: This is the API exposed by the WoDT Digital Twin Interface for Consumers.
+  - name: Platform Management Interface API
+    description: This is the API exposed by the Platform Management Interface for WoDT Platforms.
+
+paths:
+  /dtkg:
+    get:
+      tags:
+        - WoDT Digital Twin Interface API
+      summary: obtain the current Digital Twin Knowledge Graph
+      operationId: getDigitalTwinKnowledgeGraph
+      description: obtain the current Digital Twin Knowledge Graph
+      responses:
+        '200':
+          description: the Digital Twin Knowledge Graph
+          content:
+            text/turtle:
+              schema:
+                type: string
+                example: |
+                  <http://localhost:3000/>
+                    <https://lampontology.com/ontology#isOn>
+                            false;
+                    <https://lampontology/ontology#isLocatedInside>
+                            <http://example.com/house> .
+        
+
+        '204':
+          description: the current Digital Twin Knowledge Graph is empty
+
+  /dtd:
+    get:
+      tags:
+        - WoDT Digital Twin Interface API
+      summary: obtain the current Digital Twin Description of the WoDT Digital Twin
+      operationId: getDigitalTwinDescription
+      description: obtain the current Digital Twin Description of the WoDT Digital Twin
+      responses:
+        '200':
+          description: the Digital Twin Description
+          content:
+            application/td+json:
+              schema:
+                example: |
+                  {
+                      "@context": "https://www.w3.org/2022/wot/td/v1.1",
+                      "id": "http://localhost:3000",
+                      "@type": "https://lampontology.com/ontology#Lamp",
+                      "version": {
+                          "instance": "1.2.3",
+                          "model": "1.0.0"
+                      },
+                      "https://purl.org/wodt/physicalAssetId": "lampPA",
+                      "securityDefinitions": {
+                          "nosec_sc": {
+                              "scheme": "nosec"
+                          }
+                      },
+                      "security": "nosec_sc",
+                      "properties": {
+                          "is-on-property-key": {
+                              "https://purl.org/wodt/domainTag": "https://lampontology.com/ontology#isOn",
+                              "https://purl.org/wodt/augmentedInteraction": false,
+                              "readOnly": true
+                          },
+                          "located-inside": {
+                              "https://purl.org/wodt/domainTag": "https://lampontology/ontology#isLocatedInside",
+                              "readOnly": true
+                          }
+                      },
+                      "forms": [
+                          {
+                              "href": "ws://localhost:3000/dtkg",
+                              "subprotocol": "websocket",
+                              "op": "observeallproperties"
+                          }
+                      ],
+                      "links": [
+                          {
+                              "href": "https://raw.githubusercontent.com/Web-of-Digital-Twins/dtd-conceptual-model/refs/heads/main/implementations/wot/dtd-thing-model.tm.jsonld",
+                              "rel": "type",
+                              "type": "application/tm+json"
+                          },
+                          {
+                              "href": "http://localhost:3000/dtkg",
+                              "rel": "https://purl.org/wodt/dtkg"
+                          }
+                      ]
+                  }
+        '204':
+          description: the current Digital Twin Description is empty
+
+  /platform:
+    post:
+      tags:
+        - Platform Management Interface API
+      summary: notification endpoint for external registration of the Digital Twin
+      operationId: notifyRegistration
+      description: notification endpoint for external registration of the Digital Twin
+      responses:
+        '200':
+          description: notification ok
+        '400':
+          description: the notification was not structured properly or the digital twin was already registered
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                self:
+                  type: string
+                  example: http://platform.com
+                  description: the URL of the platform
+                dtUri:
+                  type: string
+                  example: http://dt-uri.com
+                  description: the URI of the Digital Twin involved in the registration notification
