@@ -39,3 +39,8 @@ You can start the adapter using the provided docker image. To start it via a doc
    3. If you want to pass an environment file whose name is different from `.env` use the `--env-file <name>` parameter.
     
 Alternatively, you can obviously start the adapter directly via Gradle.
+
+## Documentation
+- Check out the website [here](https://web-of-digital-twins.github.io/ditto-wodt-adapter/)
+- Direct link to the *Code* documentation [here](https://web-of-digital-twins.github.io/ditto-wodt-adapter/documentation/code-doc/)
+- Direct link to the *REST-API* documentation [here](https://web-of-digital-twins.github.io/ditto-wodt-adapter/documentation/openapi-doc/)
