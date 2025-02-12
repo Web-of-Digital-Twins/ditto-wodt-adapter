@@ -1,3 +1,14 @@
+## [1.1.3](https://github.com/Web-of-Digital-Twins/ditto-wodt-adapter/compare/1.1.2...1.1.3) (2025-02-12)
+
+### Documentation
+
+* **fix:** fix javadoc for the entire project ([97281d1](https://github.com/Web-of-Digital-Twins/ditto-wodt-adapter/commit/97281d129cde7d11e3314edcab719669ac7eeb7b))
+* **rest-api:** add rest api documentation ([2b7aaa2](https://github.com/Web-of-Digital-Twins/ditto-wodt-adapter/commit/2b7aaa26881ece8b68026891fe07944abfeccc67))
+
+### Build and continuous integration
+
+* **documentation:** add documentation deploy job ([e6c83b7](https://github.com/Web-of-Digital-Twins/ditto-wodt-adapter/commit/e6c83b7f49a539f2e79eb789d07673ba54f1a477))
+
 ## [1.1.2](https://github.com/Web-of-Digital-Twins/ditto-wodt-adapter/compare/1.1.1...1.1.2) (2024-12-12)
 
 ### Bug Fixes
