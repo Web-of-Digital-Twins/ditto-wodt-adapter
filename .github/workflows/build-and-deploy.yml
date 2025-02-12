@@ -89,13 +89,39 @@ jobs:
           container-registry-username: ${{ github.actor }}
           container-registry-password: ${{ secrets.GITHUB_TOKEN }}
           github-token: ${{ secrets.DEPLOYMENT_TOKEN }}
-          
+
+  documentation-deploy:
+    needs:
+      - release-and-delivery
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    if: needs.release-and-delivery.outputs.release-status == 'released'
+    steps:
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+      - name: Generate and deploy documentation
+        uses: AndreaGiulianelli/documentation-ghp-action@1.1.1
+        with:
+          should-generate-code-documentation: true
+          code-documentation-generation-command: ./gradlew javadoc
+          code-documentation-dst-folder: './build/docs/javadoc'
+          code-documentation-site-folder: 'documentation/code-doc'
+          should-generate-openapi-documentation: true
+          openapi-documentation-input-file: 'docs/rest-api/rest-api-docs.yml'
+          openapi-documentation-dst-folder: 'documentation/openapi-doc'
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
   success:
     runs-on: ubuntu-latest
     needs:
       - validation
       - build
       - release-and-delivery
+      - documentation-deploy
     if: >-
       always() && (
         contains(join(needs.*.result, ','), 'failure')
