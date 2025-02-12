@@ -26,6 +26,20 @@ public final class WoDTDigitalAdapterConfiguration {
     private final Thing thing;
     private final String digitalTwinVersion;
 
+    /**
+     * Default constructor.
+     * @param dittoUrl the ditto endpoint url
+     * @param dittoObservationEndpoint the endpoint to observe internal ditto activities
+     * @param dittoUsername ditto credential -- username
+     * @param dittoPassword ditto credential -- password
+     * @param thingId the ditto thing id to expose as a wodt dt
+     * @param yamlOntologyPath the path for the configuration file
+     * @param physicalAssetId the physical asset id associated to the dt
+     * @param platformToRegister the set of WoDT Platforms to automatically register to
+     * @param digitalTwinUri the digital twin uri to expose
+     * @param digitalTwinExposedPort the digital twin wodt adapter exposed port
+     * @param digitalTwinVersion the digital twin model version
+     */
     public WoDTDigitalAdapterConfiguration(
         final URI dittoUrl,
         final URI dittoObservationEndpoint,
@@ -84,8 +98,9 @@ public final class WoDTDigitalAdapterConfiguration {
      */
     public String getDittoPassword() {return this.dittoPassword;}
 
-    /*
+    /**
      * Return the Ditto Thing associated with the Digital Twin.
+     * @return the thing
      */
     public Thing getDittoThing() {
         return this.thing;
@@ -131,6 +146,10 @@ public final class WoDTDigitalAdapterConfiguration {
         return new HashSet<>(this.platformToRegister);
     }
 
+    /**
+     * Obtain the digital twin version.
+     * @return the digital twin version.
+     */
     public String getDigitalTwinVersion() {
         return this.digitalTwinVersion;
     }

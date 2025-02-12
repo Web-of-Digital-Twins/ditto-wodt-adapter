@@ -59,13 +59,16 @@ public interface DTDManager extends DTDManagerReader {
     */
     boolean removeAction(String rawActionName);
 
-    /*
+    /**
      * Add an event to the DTD.
+     * @param rawEventName the raw name of the event to add
      */
     void addEvent(String rawEventName);
 
-    /*
+    /**
      * Remove an event from the DTD.
+     * @param rawEventName the raw name of the event to remove
+     * @return true is correctly removed, false if not present
      */
     boolean removeEvent(String rawEventName);
 }

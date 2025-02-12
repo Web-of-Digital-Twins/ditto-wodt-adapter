@@ -19,7 +19,7 @@ package io.github.webbasedwodt.common;
 import io.javalin.Javalin;
 
 /**
- * Interface for base controllers of {@link WoDTWebServer}.
+ * Interface for base controllers of {@link io.github.webbasedwodt.WoDTDigitalTwinInterface.api.WoDTWebServer}.
 */
 public interface WebServerController {
     /**

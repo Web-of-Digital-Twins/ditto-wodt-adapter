@@ -77,6 +77,11 @@ public class WoTDTDManager implements DTDManager {
     private final Map<String, Action> actions;
     private final Map<String, Event> events;
 
+    /**
+     * Default constructor.
+     * @param configuration the adapter configuration
+     * @param platformManagementInterfaceReader the platform management interface reader instance
+     */
     public WoTDTDManager(
         final WoDTDigitalAdapterConfiguration configuration,
         final PlatformManagementInterfaceReader platformManagementInterfaceReader

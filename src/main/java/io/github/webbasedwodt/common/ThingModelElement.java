@@ -2,7 +2,7 @@ package io.github.webbasedwodt.common;
 
 import java.util.Optional;
 
-/*
+/**
  * Class representing a Thing Model field.
  */
 public class ThingModelElement {
@@ -10,6 +10,12 @@ public class ThingModelElement {
     private final Optional<String> feature;
     private final Optional<String> domainTag;
 
+    /**
+     * Default constructor.
+     * @param field the thing model field
+     * @param feature the thing feature, if present
+     * @param domainTag the domain tag, if present
+     */
     public ThingModelElement(String field, Optional<String> feature, Optional<String> domainTag) {
         this.field = field;
         this.feature = (feature.isPresent() && !feature.get().isEmpty()) ? feature : Optional.empty();
@@ -45,14 +51,26 @@ public class ThingModelElement {
                 '}';
     }
 
+    /**
+     * Get the field name.
+     * @return the field name
+     */
     public String getField() {
         return this.field;
     }
 
+    /**
+     * Get the feature, if present.
+     * @return an optional for the feature
+     */
     public Optional<String> getFeature() {
         return this.feature;
     }
 
+    /**
+     * Get the domain tag, if present.
+     * @return an optional for the domain tag
+     */
     public Optional<String> getDomainTag() {
         return this.domainTag;
     }

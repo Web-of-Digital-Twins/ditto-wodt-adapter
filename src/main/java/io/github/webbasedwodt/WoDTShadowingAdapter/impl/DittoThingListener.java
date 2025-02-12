@@ -7,7 +7,7 @@ import io.github.webbasedwodt.common.DittoBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/*
+/**
  * This class handle a Ditto Client that listen to Thing changes and messages.
  */
 public class DittoThingListener extends Thread {
@@ -18,6 +18,13 @@ public class DittoThingListener extends Thread {
     private final DittoBase client;
     private final WoDTDigitalAdapter woDTDigitalAdapter;
 
+    /**
+     * Default constructor.
+     * @param dittoEndpoint the ditto endpoint
+     * @param dittoUsername ditto endpoint credential - username
+     * @param dittoPassword ditto endpoint credential - password
+     * @param woDTDigitalAdapter the wodt digital adapter
+     */
     public DittoThingListener(final URI dittoEndpoint,
                               final String dittoUsername,
                               final String dittoPassword,
@@ -47,7 +54,10 @@ public class DittoThingListener extends Thread {
             woDTDigitalAdapter.stopAdapter();
         }
     }
-    
+
+    /**
+     * Stop the {@link DittoThingListener}.
+     */
     public void stopThread() {
         latch.countDown();
     }

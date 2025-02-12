@@ -59,8 +59,10 @@ public interface DTOntology {
      */
     Optional<Pair<RdfProperty, Individual>> mapRelationshipInstance(String rawRelationship, String targetUri);
 
-    /*
+    /**
      * Obtain the semantic type that describe the event.
+     * @param rawEvent the input raw event name
+     * @return an optional with the event type if present
      */
     Optional<String> obtainEventType(String rawEvent);
 }

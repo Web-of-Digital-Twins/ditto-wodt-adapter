@@ -26,7 +26,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
-/*
+/**
  * Utility class for Thing-related operations
  */
 public final class ThingModelUtils {
@@ -40,6 +40,10 @@ public final class ThingModelUtils {
     private static List<ThingModelElement> actionsList;
     private static List<ThingModelElement> eventsList;
 
+    /**
+     * Default constructor.
+     * @param thing the thing to handle
+     */
     public ThingModelUtils(Thing thing) {
         digitalTwinType = Optional.empty();
         this.extractDataFromThing(thing);
@@ -193,8 +197,10 @@ public final class ThingModelUtils {
         }
     }
 
-    /*
+    /**
      * Convert a string to its corresponding type.
+     * @param input the input to convert
+     * @return the result object
      */
     public static Object convertStringToType(String input) {
         // null
@@ -242,8 +248,10 @@ public final class ThingModelUtils {
         return input.replace("\"", "");
     }
 
-    /*
+    /**
      * Extract the names of the sub-properties of a JSON property.
+     * @param jsonProperty the property to handle
+     * @return the names of the sub-properties
      */
     public static List<String> extractSubPropertiesNames(final String jsonProperty) {
         List<String> subProperties = new ArrayList<>();
@@ -263,8 +271,11 @@ public final class ThingModelUtils {
         return subProperties;
     }
 
-    /*
+    /**
      * Extract the value of a sub-property of a JSON property.
+     * @param jsonValue the root property from which extract sub-property value
+     * @param key the key of the sub-property
+     * @return the sub-property value
      */
     public static String extractSubPropertyValue(final String jsonValue, final String key) {
         ObjectMapper objectMapper = new ObjectMapper();
@@ -286,22 +297,42 @@ public final class ThingModelUtils {
         }
     }
 
+    /**
+     * Get the Digital Twin type.
+     * @return an option with the digital twin type
+     */
     public Optional<String> getDigitalTwinType() {
         return digitalTwinType;
-    }    
+    }
 
+    /**
+     * Get the underlying thing model context extensions.
+     * @return the list of context extensions
+     */
     public List<ThingModelElement> getTMContextExtensions() {
         return List.copyOf(contextExtensionsList);
     }
 
+    /**
+     * Get the thing model properties.
+     * @return the list of properties.
+     */
     public List<ThingModelElement> getTMProperties() {
         return List.copyOf(propertiesList);
     }
 
+    /**
+     * Get the thing model actions.
+     * @return the list of actions.
+     */
     public List<ThingModelElement> getTMActions() {
         return List.copyOf(actionsList);
     }
 
+    /**
+     * Get the thing model events.
+     * @return the list of events.
+     */
     public List<ThingModelElement> getTMEvents() {
         return List.copyOf(eventsList);
     }

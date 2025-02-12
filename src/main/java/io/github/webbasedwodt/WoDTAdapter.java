@@ -7,10 +7,14 @@ import io.github.webbasedwodt.WoDTShadowingAdapter.impl.WoDTDigitalAdapter;
 import io.github.webbasedwodt.config.ConfigurationLoader;
 import io.github.webbasedwodt.config.EnvironmentConfigurationLoader;
 
-/*
+/**
  * Application entry point.
  */
 public class WoDTAdapter {
+    /**
+     * Main Entry point
+     * @param args the input args
+     */
     public static void main(String[] args) {
         final ConfigurationLoader configurationLoader = new EnvironmentConfigurationLoader();
 

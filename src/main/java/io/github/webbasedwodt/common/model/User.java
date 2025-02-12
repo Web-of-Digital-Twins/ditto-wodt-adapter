@@ -17,33 +17,59 @@ package io.github.webbasedwodt.common.model;
  * Messages.
  */
 public class User {
-
+    /**
+     * The content type of the serialization output.
+     */
     public static final String USER_CUSTOM_CONTENT_TYPE = "application/vnd.my-company.user+json";
 
     private String userName;
     private String email;
 
+    /**
+     * Empty constructor.
+     */
     public User() {
         super();
     }
 
+    /**
+     * Default constructor
+     * @param userName the username of the user
+     * @param email the email of the user
+     */
     public User(final String userName, final String email) {
         this.userName = userName;
         this.email = email;
     }
 
+    /**
+     * Get the username of the user.
+     * @return the username of the user
+     */
     public String getUserName() {
         return userName;
     }
 
+    /**
+     * Set the username of the user.
+     * @param userName the new username to set
+     */
     public void setUserName(final String userName) {
         this.userName = userName;
     }
 
+    /**
+     * Get the email of the user.
+     * @return the email of the user
+     */
     public String getEmail() {
         return email;
     }
 
+    /**
+     * Set a new email for the user.
+     * @param email the new email to set
+     */
     public void setEmail(final String email) {
         this.email = email;
     }

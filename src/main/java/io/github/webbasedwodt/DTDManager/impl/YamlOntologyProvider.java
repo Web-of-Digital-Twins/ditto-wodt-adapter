@@ -28,6 +28,7 @@ public final class YamlOntologyProvider {
 
     /**
      * Constructor that takes the name of a YAML file and parses its content.
+     * @param yamlFileName the yaml config file path
      */
     @SuppressWarnings("unchecked")
     public YamlOntologyProvider(String yamlFileName) {
@@ -94,6 +95,7 @@ public final class YamlOntologyProvider {
 
     /**
      * Returns the Digital Twin Type from the YAML file.
+     * @return an optional with the digital twin type
      */
     public Optional<String> getDigitalTwinType() {
         return digitalTwinType;
@@ -101,6 +103,7 @@ public final class YamlOntologyProvider {
 
     /**
      * Returns the properties and relationships defined in the YAML file.
+     * @return a list of optional property configurations
      */
     public List<Optional<Map<String, String>>> getProperties() {
         return properties;
@@ -108,6 +111,7 @@ public final class YamlOntologyProvider {
 
     /**
      * Returns the actions defined in the YAML file.
+     * @return a list of optional action configurations
      */
     public List<Optional<Map<String, String>>> getActions() {
         return actions;
@@ -115,6 +119,7 @@ public final class YamlOntologyProvider {
 
     /**
      * Returns the events defined in the YAML file.
+     * @return a list of optional event configurations
      */
     public List<Optional<Map<String, String>>> getEvents() {
         return events;

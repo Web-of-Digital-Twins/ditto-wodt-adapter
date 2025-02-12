@@ -71,6 +71,9 @@ public final class WoDTDigitalAdapter {
         dittoClientThread.start();
     }
 
+    /**
+     * Stop the adapter.
+     */
     public void stopAdapter() {
         this.platformManagementInterface.signalDigitalTwinDeletion();
         this.dittoClientThread.stopThread();
@@ -171,6 +174,10 @@ public final class WoDTDigitalAdapter {
                 .forEach(event -> handleEvent(event.getField(), false, null));
     }
 
+    /**
+     * Handle a thing change.
+     * @param change the change to handle
+     */
     public void onThingChange(ThingChange change) {
         switch (change.getAction()) {
             case CREATED, MERGED, UPDATED:

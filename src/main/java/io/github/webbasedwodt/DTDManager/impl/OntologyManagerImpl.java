@@ -17,11 +17,19 @@ import io.github.webbasedwodt.ontology.Literal;
 import io.github.webbasedwodt.ontology.Node;
 import io.github.webbasedwodt.ontology.RdfProperty;
 
+/**
+ * This class handles ontological information from the two possible configurations: thing model and config file.
+ */
 public final class OntologyManagerImpl implements DTOntology, OntologyManager {
     
     private final ThingModelUtils thingModelUtils;
     private Optional<YamlOntologyProvider> yamlOntologyHandler = Optional.empty();
 
+    /**
+     * Default constructor.
+     * @param dittoThing the ditto thing to expose
+     * @param yamlOntologyPath the yaml config file path
+     */
     public OntologyManagerImpl(
         Thing dittoThing,
         String yamlOntologyPath

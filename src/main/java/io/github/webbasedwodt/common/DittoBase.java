@@ -46,6 +46,12 @@ public class DittoBase {
     private static final int TIMEOUT = 10;
     private final DittoClient client;
 
+    /**
+     * Default constructor
+     * @param dittoEndpoint the ditto endpoint
+     * @param dittoUsername ditto endpoint credential - username
+     * @param dittoPassword ditto endpoint credential - password
+     */
     public DittoBase(final URI dittoEndpoint, final String dittoUsername, final String dittoPassword) {
         try {
             client = buildClient(dittoEndpoint, dittoUsername, dittoPassword)
@@ -55,6 +61,10 @@ public class DittoBase {
         }
     }
 
+    /**
+     * Get ditto client.
+     * @return the client
+     */
     public DittoClient getClient() {
         return this.client;
     }
